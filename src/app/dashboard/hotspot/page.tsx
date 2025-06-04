@@ -1,8 +1,25 @@
+
+import MapInstance from "@/components/common/MapInstance";
+import { MapProvider } from "@/components/context/MapProvider";
+
+
 export default function HotspotMonitoring() {
+
+  const mapView = {
+    center: [106.8456, -6.2088] as [number, number], // Jakarta
+    zoom: 10,
+    pitch: 0,
+    bearing: 0,
+};
+
+
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Hotspot Monitoring</h2>
-      <p className="text-gray-600">This page will display real-time fire hotspot data using satellite imagery.</p>
-    </div>
+      <MapProvider>
+        <MapInstance
+          id="map"
+          mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
+          mapView={mapView}
+        />
+      </MapProvider>
   )
 }

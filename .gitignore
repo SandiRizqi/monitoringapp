@@ -19,7 +19,7 @@
 
 # production
 /build
-
+/jobs
 # misc
 .DS_Store
 *.pem
@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+geocircle-512f9-da9e8ec3cfbc.json

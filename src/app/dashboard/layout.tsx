@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Sidebar from "@/components/widget/Siderbar";
 import Header from "@/components/widget/Header";
 import "./globals.css";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,13 +32,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex h-screen bg-gray-50">
-              <Sidebar />
-              <div className="flex flex-col flex-1 overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto p-6">{children}</main>
-              </div>
-            </div>
+        <div className="flex h-screen w-full bg-gray-50">
+          {/* Sidebar should be positioned absolutely in mobile inside its component */}
+          <Sidebar />
+          <div className="flex flex-col flex-1 min-w-0">
+            <Header />
+            <main className="flex-1 overflow-y-auto">
+              {children}
+            </main>
+          </div>
+        </div>
       </body>
     </html>
   );
