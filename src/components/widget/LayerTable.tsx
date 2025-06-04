@@ -1,0 +1,96 @@
+import { Layer } from "../types/layers";
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react"; // Gunakan lucide-react untuk ikon
+
+
+type Props = {
+  layers: Layer[];
+  onEdit: (layer: Layer) => void;
+  onDelete: (id: string) => void;
+};
+
+const ITEMS_PER_PAGE = 5;
+
+export default function LayerTable({ layers, onEdit, onDelete }: Props) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(layers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentLayers = layers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  return (
+    <div className="w-full mt-6 bg-white shadow rounded-lg overflow-hidden">
+      <table className="w-full table-auto">
+        <thead className="bg-gray-300 text-gray-700 text-sm uppercase">
+          <tr>
+            <th className="px-4 py-3 text-left">Name</th>
+            <th className="px-4 py-3 text-left">Type</th>
+            <th className="px-4 py-3 text-left">Symbology</th>
+            <th className="px-4 py-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentLayers.map((layer) => (
+            <tr
+              key={layer.id}
+              className="hover:bg-gray-50 transition border-t"
+            >
+              <td className="px-4 py-2">{layer.name}</td>
+              <td className="px-4 py-2 capitalize">{layer.type}</td>
+              <td className="px-4 py-2 truncate max-w-xs">{layer.symbology}</td>
+              <td className="px-4 py-2 flex items-center gap-2">
+                <button
+                  className="text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                  onClick={() => onEdit(layer)}
+                  title="Edit"
+                >
+                  <Pencil size={18} />
+                </button>
+                <button
+                  className="text-red-600 hover:text-red-800 cursor-pointer"
+                  onClick={() => onDelete(layer.id)}
+                  title="Delete"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </td>
+            </tr>
+          ))}
+          {currentLayers.length === 0 && (
+            <tr>
+              <td colSpan={4} className="text-center px-4 py-6 text-gray-500">
+                No layers found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t">
+          <span className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <button
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+          
+    </div>
+  );
+}

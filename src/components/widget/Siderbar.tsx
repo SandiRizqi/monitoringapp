@@ -26,8 +26,8 @@ const menuGroups = [
   {
     label: 'Data',
     items: [
-      { name: 'Data Layers', icon: <Database size={18} />, href: '/dashboard/data/layers' },
-      { name: 'Satellite Sources', icon: <Database size={18} />, href: '/dashboard/data/sources' },
+      { name: 'Data Layers', icon: <Database size={18} />, href: '/dashboard/data' },
+      { name: 'Satellite Sources', icon: <Database size={18} />, href: '/dashboard/satellites' },
     ],
   },
   {
