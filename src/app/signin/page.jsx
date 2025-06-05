@@ -43,4 +43,4 @@ const SignInPage = () => {
 }
 
 
-export default withoutAuth(SignInPage)
+export default withoutAuth(SignInPage);

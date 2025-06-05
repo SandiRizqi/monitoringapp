@@ -14,6 +14,13 @@ interface ExtendedJWT extends JWT {
   error?: string;
 }
 
+interface ResponseUser {
+  message: string
+  user_id: string
+  email: string
+  token: string
+}
+
 
 
 
@@ -51,8 +58,9 @@ async function refreshAccessToken(token: ExtendedJWT): Promise<ExtendedJWT> {
 };
 
 
-async function saveUser(user: AdapterUser, id: string) {
-    // console.log(user);
+
+
+async function saveUser(user: AdapterUser, id: string): Promise<ResponseUser | null> {
   try {
     const response = await fetch(`${process.env.BACKEND_URL}/accounts/saveuser/?id=${id}`, {
       method: "POST",
@@ -63,14 +71,18 @@ async function saveUser(user: AdapterUser, id: string) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to save user");
-    };
+      console.error("Failed to save user:", response.statusText);
+      return null;
+    }
 
-    console.log(response)
+    const data = await response.json();
+    return data; // return data jika berhasil
   } catch (err) {
     console.error("Error saving user:", err);
+    return null; // return null jika error terjadi
   }
 }
+
 
 
 
@@ -94,12 +106,13 @@ export const authOptions: NextAuthOptions = {
       // console.log(token)
       // Initial sign in
       if (account && user) {
-        await saveUser(user as AdapterUser, user.id as string)
+        const responseUser = await saveUser(user as AdapterUser, user.id as string)
         return {
           ...token,
           accessToken: account.access_token,
           idToken: account.id_token, // Google ID Token (JWT)
           refreshToken: account.refresh_token,
+          userToken: responseUser?.token,
           id: user.id,
           ...account
         }
@@ -113,6 +126,8 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
+
+
     async session({ session, token }) {
       
       return {
@@ -120,6 +135,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.sub,
+          token: token.userToken
         },
         accessToken: token.accessToken,
         idToken: token.idToken,
