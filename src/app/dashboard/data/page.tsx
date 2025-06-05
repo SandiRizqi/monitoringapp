@@ -52,7 +52,7 @@ export default function LayersPage() {
 
                 <div className='p-4'>
                     <div className="flex justify-between items-center">
-                    <h1 className="text-xl font-bold mb-4">Data Layers</h1>
+                    <h1 className="text-xl font-bold mb-4 text-gray-800">Data Layers</h1>
                     <button
                         onClick={handleAdd}
                         className="bg-indigo-600 text-white px-4 py-2 rounded cursor-pointer shadow"

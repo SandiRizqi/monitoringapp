@@ -24,7 +24,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 text-gray-800">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
