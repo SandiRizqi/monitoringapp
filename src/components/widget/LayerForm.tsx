@@ -1,6 +1,7 @@
 'use client'
 import { Layer } from '../types/layers';
 import { useState } from 'react';
+import Dropzone from '../common/Dropzone';
 
 type Props = {
   initialData?: Layer;
@@ -10,8 +11,12 @@ type Props = {
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const [form, setForm] = useState<Layer>(
-    initialData || { id: '', name: '', type: 'polygon', symbology: '' }
+    initialData || { id: '', name: '', type: 'Polygon', symbology: '#000000' }
   );
+
+  const onUpload = (data:[number, number][]) => {
+    console.log(data);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -48,18 +53,22 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
         >
-          <option value="polygon">Polygon</option>
-          <option value="point">point</option>
-          <option value="polyline">Polyline</option>
+          <option value="Polygon">Polygon</option>
+          <option value="Point">Point</option>
+          <option value="LineString">LineString</option>
         </select>
 
         <input
           name="symbology"
+          type='color'
           value={form.symbology}
           onChange={handleChange}
           placeholder="Color code"
-          className="w-full p-2 border rounded mb-4"
+          className="w-full h-10 border rounded mb-4"
+          required
         />
+
+        <Dropzone onUpload={onUpload}/>
 
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded cursor-pointer">

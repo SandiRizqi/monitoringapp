@@ -93,7 +93,7 @@ export default function Sidebar() {
       {/* Toggle Button (only when sidebar hidden on mobile) */}
       {!isOpen && (
         <button
-          className="md:hidden absolute top-4 left-4  p-2 bg-white rounded-md shadow-xs z-50"
+          className="md:hidden absolute top-4 left-4  p-2 bg-white rounded-md shadow-xs z-50 text-gray-500"
           onClick={() => setIsOpen(true)}
         >
           <Menu size={24} />

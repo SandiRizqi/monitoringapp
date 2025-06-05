@@ -6,6 +6,7 @@ import LayerForm from '@/components/widget/LayerForm';
 import { MapProvider } from '@/components/context/MapProvider';
 import MapInstance from '@/components/common/MapInstance';
 import { DEFAULT_MAPVIEW } from '@/components/conts';
+import { Notification } from '@/components/common/Notification';
 
 
 export default function LayersPage() {
@@ -36,6 +37,7 @@ export default function LayersPage() {
                 return [...prev, layer];
             }
         });
+        Notification("Success", "The data was saved successfuly");
         setShowForm(false);
     };
 
