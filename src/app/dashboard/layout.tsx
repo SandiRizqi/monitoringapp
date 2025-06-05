@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Sidebar from "@/components/widget/Siderbar";
-import Header from "@/components/widget/Header";
-import "./globals.css";
+import SessionHeader from "@/components/widget/SessionHeader";
+import "../../style/globals.css"
 import "maplibre-gl/dist/maplibre-gl.css";
 
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "",
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -36,7 +36,7 @@ export default function RootLayout({
           {/* Sidebar should be positioned absolutely in mobile inside its component */}
           <Sidebar />
           <div className="flex flex-col flex-1 min-w-0">
-            <Header />
+            <SessionHeader />
             <main className="flex-1 overflow-y-auto">
               {children}
             </main>
