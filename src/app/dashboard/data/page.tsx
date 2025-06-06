@@ -16,8 +16,8 @@ const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const {data: session} = useSession();
+    const [loading, setLoading] = useState(true);
+    const {data: session, status } = useSession();
 
     const handleAdd = () => {
         setEditingLayer(null);
@@ -74,7 +74,7 @@ const  LayersPage = () => {
             fetchLayers();
         };
 
-    }, [session]);
+    }, [status, session]);
 
     return (
         <div className='flex flex-col'>

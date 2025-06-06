@@ -72,7 +72,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           {currentLayers.map((layer) => (
             <tr
               key={layer.id}
-              className="hover:bg-gray-50 transition border-t text-gray-800"
+              className="hover:bg-gray-50 transition border-t text-gray-800 cursor-pointer"
             >
               <td className="px-4 py-2">{layer.name}</td>
               <td className="px-4 py-2 capitalize">{layer.geometry_type}</td>

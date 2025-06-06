@@ -6,7 +6,7 @@ import { useState } from 'react'
 import {
   Flame,
   TreePine,
-  Map,
+  // Map,
   Database,
   Users,
   Key,
@@ -18,9 +18,9 @@ const menuGroups = [
   {
     label: 'Apps',
     items: [
-      { name: 'Hotspot Monitoring', icon: <Flame size={18} />, href: '/dashboard/hotspot' },
-      { name: 'Deforestation Monitoring', icon: <TreePine size={18} />, href: '/dashboard/deforestation' },
-      { name: 'Border Monitoring', icon: <Map size={18} />, href: '/dashboard/border' },
+      { name: 'Hotspot Alerts', icon: <Flame size={18} />, href: '/dashboard/hotspot' },
+      { name: 'Deforestation Alerts', icon: <TreePine size={18} />, href: '/dashboard/deforestation' },
+      // { name: 'Border Monitoring', icon: <Map size={18} />, href: '/dashboard/border' },
     ],
   },
   {
