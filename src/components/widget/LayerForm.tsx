@@ -11,7 +11,7 @@ type Props = {
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const [form, setForm] = useState<Layer>(
-    initialData || { id: '', name: '', type: 'Polygon', symbology: '#000000' }
+    initialData || { id: '', name: '', geometry_type: 'Polygon', stroke_color: '#000000' }
   );
 
   const onUpload = (data:[number, number][]) => {
@@ -49,7 +49,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
         <select
           name="type"
-          value={form.type}
+          value={form.geometry_type}
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
         >
@@ -61,7 +61,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
         <input
           name="symbology"
           type='color'
-          value={form.symbology}
+          value={form.stroke_color}
           onChange={handleChange}
           placeholder="Color code"
           className="w-full h-10 border rounded mb-4"

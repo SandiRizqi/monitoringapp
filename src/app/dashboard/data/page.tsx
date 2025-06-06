@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layer } from '@/components/types/layers';
 import LayerTable from '@/components/widget/LayerTable';
 import LayerForm from '@/components/widget/LayerForm';
@@ -7,12 +7,17 @@ import { MapProvider } from '@/components/context/MapProvider';
 import MapInstance from '@/components/common/MapInstance';
 import { DEFAULT_MAPVIEW } from '@/components/conts';
 import { Notification } from '@/components/common/Notification';
+import { useSession } from 'next-auth/react';
+import { SessionProvider } from 'next-auth/react';
+import { BACKEND_URL } from '@/components/conts';
 
 
-export default function LayersPage() {
+const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const {data: session} = useSession();
 
     const handleAdd = () => {
         setEditingLayer(null);
@@ -41,6 +46,36 @@ export default function LayersPage() {
         setShowForm(false);
     };
 
+
+    useEffect(() => {
+        const fetchLayers = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`${BACKEND_URL}/data/user-aois/`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${session?.user.token}`, // Ganti ini
+                        },
+                    }
+                );
+                if (!res.ok) throw new Error('Failed to fetch layers');
+                const data: Layer[] = await res.json();
+                setLayers(data);
+            } catch {
+                Notification("Error", 'Something went wrong');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if(session) {
+            fetchLayers();
+        };
+
+    }, [session]);
+
     return (
         <div className='flex flex-col'>
             <MapProvider>
@@ -64,7 +99,7 @@ export default function LayersPage() {
                 </div>
 
                 <div className='min-h-[40vh] my-2'>
-                    <LayerTable layers={layers} onEdit={handleEdit} onDelete={handleDelete} />
+                    <LayerTable layers={layers} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
                 </div>
                 </div>
 
@@ -80,4 +115,13 @@ export default function LayersPage() {
             </MapProvider>
         </div>
     );
+}
+
+
+export default function SessionDataPage () {
+    return (
+        <SessionProvider>
+            <LayersPage/>
+        </SessionProvider>
+    )
 }

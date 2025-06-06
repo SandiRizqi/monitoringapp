@@ -19,10 +19,25 @@ export type Geometry = PointGeometry | LineStringGeometry | PolygonGeometry;
 
 
 
-export interface Layer {
+export interface LayerGeom {
   id: string;
   name: string;
   type: LayerType;
   symbology: string; // can be URL, color code, or JSON config
   geometry?: Geometry
+}
+
+
+export interface Layer {
+  id: string;
+  geometry_type: string;
+  name: string;
+  description?: string;
+  srid?: number;
+  created_at?: string;
+  updated_at?: string;
+  fill_color?: string;
+  stroke_color?: string;
+  stroke_width?: number;
+  marker_size?: number;
 }

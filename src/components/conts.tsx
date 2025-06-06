@@ -4,3 +4,6 @@ export const DEFAULT_MAPVIEW =  {
     pitch: 0,
     bearing: 0,
 };
+
+
+export const BACKEND_URL = "https://monitoringbackend-1075290745302.asia-southeast1.run.app"
