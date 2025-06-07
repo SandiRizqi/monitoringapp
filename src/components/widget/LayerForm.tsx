@@ -9,12 +9,13 @@ import { Notification } from '../common/Notification';
 
 type Props = {
   initialData?: Layer;
-  onSubmit: (layer: Layer) => void;
+  onSubmit: (layer: Layer) => Promise<void>; 
   onClose: () => void;
 };
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const{map, drawPolygon} = useMap();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form, setForm] = useState<Layer>(
     initialData || {
       name: '',
@@ -75,14 +76,21 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.geometry) {
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!form.geometry) {
     Notification("Error", "You must input the geometry.");
     return;
   }
-    onSubmit(form);
-  };
+
+  setIsLoading(true);
+  try {
+    await onSubmit(form); // tunggu hingga selesai
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-60 text-gray-800 p-4">
@@ -154,9 +162,10 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 text-white rounded cursor-pointer flex items-center justify-center"
+              disabled={isLoading}
             >
-              Save
+              {isLoading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

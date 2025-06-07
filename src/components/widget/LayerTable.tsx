@@ -113,14 +113,14 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           </span>
           <div className="flex gap-2">
             <button
-              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600 cursor-pointer"
               onClick={() => setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
             >
               Previous
             </button>
             <button
-              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600 cursor-pointer"
               onClick={() => setCurrentPage((prev) => prev + 1)}
               disabled={currentPage === totalPages}
             >

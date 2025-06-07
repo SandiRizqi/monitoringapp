@@ -55,10 +55,39 @@ const  LayersPage = () => {
         setShowForm(true);
     };
 
-    const handleDelete = (id: string | null | undefined) => {
+    const handleDelete = async (id: string | null | undefined) => {
         if (!id) return;
+        if (!session?.user?.token) return;
+        try {
+            const res = await fetch(`${BACKEND_URL}/data/user-aois/?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${session.user.token}`,
+                },
+            });
 
-        setLayers((prev) => prev.filter((l) => l.id !== id));
+            
+
+            if (!res.ok) {
+                const result = await res.json(); // Par
+                // Extract `detail` or fallback to generic error message
+                const message = result?.detail || 'Failed to save data';
+                throw new Error(message);
+            }
+
+            Notification("Success", "The data was deleted successfully");
+        } catch (error) {
+            // console.error(error);
+            if (error instanceof Error) {
+                Notification("Error", error.message);
+            } else {
+                Notification("Error", "Something went wrong");
+            }
+        } finally {
+            await fetchLayers();
+        }
+
     };
 
     const handleSave = async (layer: Layer) => {
@@ -83,7 +112,6 @@ const  LayersPage = () => {
 
             Notification("Success", "The data was saved successfully");
             setShowForm(false);
-            await fetchLayers();
         } catch (error) {
             // console.error(error);
             if (error instanceof Error) {
@@ -92,7 +120,7 @@ const  LayersPage = () => {
                 Notification("Error", "Something went wrong");
             }
         } finally {
-            
+            await fetchLayers();
         }
     };
 
