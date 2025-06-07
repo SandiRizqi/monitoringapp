@@ -12,7 +12,7 @@ export interface LineStringGeometry {
 
 export interface PolygonGeometry {
   type: "Polygon";
-  coordinates: [ [number, number][] ]; // array of LinearRings
+  coordinates:  [[number, number][]] ; // array of LinearRings
 }
 
 export type Geometry = PointGeometry | LineStringGeometry | PolygonGeometry;
@@ -29,7 +29,7 @@ export interface LayerGeom {
 
 
 export interface Layer {
-  id: string;
+  id?: string;
   geometry_type: string;
   name: string;
   description?: string;
@@ -40,5 +40,5 @@ export interface Layer {
   stroke_color?: string;
   stroke_width?: number;
   marker_size?: number;
-  geometry? :[number, number][] | null
+  geometry? :PolygonGeometry | null
 }

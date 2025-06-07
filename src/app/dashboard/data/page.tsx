@@ -12,6 +12,8 @@ import { SessionProvider } from 'next-auth/react';
 import { BACKEND_URL } from '@/components/conts';
 
 
+
+
 const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
@@ -19,35 +21,6 @@ const  LayersPage = () => {
     const [loading, setLoading] = useState(true);
     const {data: session, status } = useSession();
 
-    const handleAdd = () => {
-        setEditingLayer(null);
-        setShowForm(true);
-    };
-
-    const handleEdit = (layer: Layer) => {
-        setEditingLayer(layer);
-        setShowForm(true);
-    };
-
-    const handleDelete = (id: string) => {
-        setLayers((prev) => prev.filter((l) => l.id !== id));
-    };
-
-    const handleSave = (layer: Layer) => {
-        setLayers((prev) => {
-            const exists = prev.find((l) => l.id === layer.id);
-            if (exists) {
-                return prev.map((l) => (l.id === layer.id ? layer : l));
-            } else {
-                return [...prev, layer];
-            }
-        });
-        Notification("Success", "The data was saved successfuly");
-        setShowForm(false);
-    };
-
-
-    useEffect(() => {
     const fetchLayers = async () => {
         if (!session?.user?.token) return;
 
@@ -72,10 +45,64 @@ const  LayersPage = () => {
         }
     };
 
-    if (status === 'authenticated') {
-        fetchLayers();
-    }
-}, [status, session]);
+    const handleAdd = () => {
+        setEditingLayer(null);
+        setShowForm(true);
+    };
+
+    const handleEdit = (layer: Layer) => {
+        setEditingLayer(layer);
+        setShowForm(true);
+    };
+
+    const handleDelete = (id: string | null | undefined) => {
+        if (!id) return;
+
+        setLayers((prev) => prev.filter((l) => l.id !== id));
+    };
+
+    const handleSave = async (layer: Layer) => {
+        if (!session?.user?.token) return;
+        try {
+            const res = await fetch(`${BACKEND_URL}/data/user-aois/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${session.user.token}`,
+                },
+                body: JSON.stringify(layer),  // <-- This sends the form data
+            });
+
+            const result = await res.json(); // Par
+
+            if (!res.ok) {
+                // Extract `detail` or fallback to generic error message
+                const message = result?.detail || 'Failed to save data';
+                throw new Error(message);
+            }
+
+            Notification("Success", "The data was saved successfully");
+            setShowForm(false);
+            await fetchLayers();
+        } catch (error) {
+            // console.error(error);
+            if (error instanceof Error) {
+                Notification("Error", error.message);
+            } else {
+                Notification("Error", "Something went wrong");
+            }
+        } finally {
+            
+        }
+    };
+
+
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            fetchLayers();
+        }
+    }, [status, session]);
 
     return (
         <div className='flex flex-col'>

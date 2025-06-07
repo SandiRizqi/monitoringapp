@@ -17,7 +17,6 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const{map, drawPolygon} = useMap();
   const [form, setForm] = useState<Layer>(
     initialData || {
-      id: '',
       name: '',
       geometry_type: 'Polygon',
       description: '',
@@ -56,7 +55,10 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
     setForm((prev) => ({
       ...prev,
-      geometry: coords
+      geometry: {
+        type: "Polygon",
+        coordinates: [coords]
+      }
     }));
 
 
@@ -75,10 +77,10 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.geometry){
-      Notification("Error", "You mush input the geometry.")
-      return;
-    }
+    if (!form.geometry) {
+    Notification("Error", "You must input the geometry.");
+    return;
+  }
     onSubmit(form);
   };
 

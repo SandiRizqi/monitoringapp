@@ -7,7 +7,7 @@ type Props = {
   layers: Layer[];
   loading?: boolean;
   onEdit: (layer: Layer) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string | null | undefined) => void;
 };
 
 const ITEMS_PER_PAGE = 5;
