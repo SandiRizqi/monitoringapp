@@ -1,7 +1,10 @@
 'use client'
-import { Layer } from '../types/layers';
 import { useState } from 'react';
 import Dropzone from '../common/Dropzone';
+import { Layer } from '../types/layers';
+import MapInstance from '../common/MapInstance';
+import { useMap } from '../context/MapProvider';
+import { DEFAULT_MAPVIEW } from '../conts';
 
 type Props = {
   initialData?: Layer;
@@ -10,75 +13,149 @@ type Props = {
 };
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
+  const{map, drawPolygon} = useMap();
   const [form, setForm] = useState<Layer>(
-    initialData || { id: '', name: '', geometry_type: 'Polygon', stroke_color: '#000000' }
+    initialData || {
+      id: '',
+      name: '',
+      geometry_type: 'Polygon',
+      description: '',
+      fill_color: '#FFEDA0',
+      stroke_color: '#000000',
+      stroke_width: 1,
+    }
   );
 
-  const onUpload = (data:[number, number][]) => {
-    console.log(data);
-  }
+  const onUpload = (coords: [number, number][]) => {
+    // console.log('Uploaded coordinates:', coords);
+    if (!map) return;
+    const bounds = coords.reduce(
+      (bbox, coord) => {
+        return [
+          [Math.min(bbox[0][0], coord[0]), Math.min(bbox[0][1], coord[1])], // Min values
+          [Math.max(bbox[1][0], coord[0]), Math.max(bbox[1][1], coord[1])], // Max values
+        ];
+      },
+      [
+        [Infinity, Infinity], // Min lng, lat
+        [-Infinity, -Infinity], // Max lng, lat
+      ]
+    );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    drawPolygon(coords, form);
+
+    map.fitBounds(bounds as [[number, number], [number, number]], {
+      padding: 0, // Add padding for visibility
+      duration: 0, // Smooth animation
+    });
+
+
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === 'stroke_width' ? parseInt(value) || 0 : value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ ...form, id: form.id || Date.now().toString() });
+    onSubmit(form);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 text-gray-800">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
-      >
-        <h2 className="text-lg font-bold mb-4">
-          {initialData ? 'Edit Layer' : 'Add Layer'}
-        </h2>
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-60 text-gray-800 p-4">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl h-[80vh] overflow-hidden flex gap-6">
+        {/* Left: Form */}
+        <form onSubmit={handleSubmit} className="w-1/2 flex flex-col overflow-y-auto">
+          <h2 className="text-lg font-bold mb-4">
+            {initialData ? 'Edit Layer' : 'Add Layer'}
+          </h2>
 
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Layer name"
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
+          <input
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Layer name"
+            className="w-full p-2 border rounded mb-4"
+            required
+          />
 
-        <select
-          name="type"
-          value={form.geometry_type}
-          onChange={handleChange}
-          className="w-full p-2 border rounded mb-4"
-        >
-          <option value="Polygon">Polygon</option>
-          <option value="Point">Point</option>
-          <option value="LineString">LineString</option>
-        </select>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Description"
+            className="w-full p-2 border rounded mb-4"
+            rows={3}
+          />
 
-        <input
-          name="symbology"
-          type='color'
-          value={form.stroke_color}
-          onChange={handleChange}
-          placeholder="Color code"
-          className="w-full h-10 border rounded mb-4"
-          required
-        />
 
-        <Dropzone onUpload={onUpload}/>
 
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded cursor-pointer">
-            Cancel
-          </button>
-          <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded cursor-pointer">
-            Save
-          </button>
+          <label className="mb-1">Fill Color</label>
+          <input
+            name="fill_color"
+            type="color"
+            value={form.fill_color}
+            onChange={handleChange}
+            className="w-full h-6 border rounded mb-4"
+          />
+
+          <label className="mb-1">Stroke Color</label>
+          <input
+            name="stroke_color"
+            type="color"
+            value={form.stroke_color}
+            onChange={handleChange}
+            className="w-full h-6 border rounded mb-4"
+            required
+          />
+
+          <label className="mb-1">Stroke Width</label>
+          <input
+            name="stroke_width"
+            type="number"
+            value={form.stroke_width}
+            onChange={handleChange}
+            className="w-full p-2 border rounded mb-4"
+            min={0}
+          />
+
+          <Dropzone onUpload={onUpload} />
+
+          <div className="mt-auto flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 rounded cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded cursor-pointer"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+
+        {/* Right: Map Preview */}
+        <div className="w-1/2 bg-gray-100 rounded-lg">
+          <div className="w-full h-full border border-gray-300 rounded bg-white flex items-center justify-center">
+            <MapInstance
+              id="map-layer-upload-preview"
+              mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
+              mapView={DEFAULT_MAPVIEW}
+            />
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
