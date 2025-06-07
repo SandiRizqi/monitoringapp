@@ -48,33 +48,34 @@ const  LayersPage = () => {
 
 
     useEffect(() => {
-        const fetchLayers = async () => {
-            setLoading(true);
-            try {
-                const res = await fetch(`${BACKEND_URL}/data/user-aois/`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Token ${session?.user.token}`, // Ganti ini
-                        },
-                    }
-                );
-                if (!res.ok) throw new Error('Failed to fetch layers');
-                const data: Layer[] = await res.json();
-                setLayers(data);
-            } catch {
-                Notification("Error", 'Something went wrong');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchLayers = async () => {
+        if (!session?.user?.token) return;
 
-        if(session) {
-            fetchLayers();
-        };
+        setLoading(true);
+        try {
+            const res = await fetch(`${BACKEND_URL}/data/user-aois/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${session.user.token}`,
+                },
+            });
 
-    }, [status, session]);
+            if (!res.ok) throw new Error('Failed to fetch layers');
+            const data: Layer[] = await res.json();
+            setLayers(data);
+        } catch (error) {
+            console.error(error);
+            Notification("Error", 'Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (status === 'authenticated') {
+        fetchLayers();
+    }
+}, [status, session]);
 
     return (
         <div className='flex flex-col'>

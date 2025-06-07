@@ -5,6 +5,7 @@ import { Layer } from '../types/layers';
 import MapInstance from '../common/MapInstance';
 import { useMap } from '../context/MapProvider';
 import { DEFAULT_MAPVIEW } from '../conts';
+import { Notification } from '../common/Notification';
 
 type Props = {
   initialData?: Layer;
@@ -23,6 +24,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
       fill_color: '#FFEDA0',
       stroke_color: '#000000',
       stroke_width: 1,
+      geometry: null
     }
   );
 
@@ -42,12 +44,20 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
       ]
     );
 
+
+
     drawPolygon(coords, form);
 
+
     map.fitBounds(bounds as [[number, number], [number, number]], {
-      padding: 0, // Add padding for visibility
+      padding: 5, // Add padding for visibility
       duration: 0, // Smooth animation
     });
+
+    setForm((prev) => ({
+      ...prev,
+      geometry: coords
+    }));
 
 
   };
@@ -65,6 +75,10 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.geometry){
+      Notification("Error", "You mush input the geometry.")
+      return;
+    }
     onSubmit(form);
   };
 

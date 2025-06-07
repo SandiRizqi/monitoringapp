@@ -40,4 +40,5 @@ export interface Layer {
   stroke_color?: string;
   stroke_width?: number;
   marker_size?: number;
+  geometry? :[number, number][] | null
 }
