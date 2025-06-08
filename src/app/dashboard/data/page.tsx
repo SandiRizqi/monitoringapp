@@ -141,6 +141,10 @@ const  LayersPage = () => {
 
         const handleLoad = () => {
             if (map.getSource("aois")) return;
+            map.fitBounds([
+                [95.0, -11.0],
+                [141.0, 6.0]
+            ]);
             map.addSource("aois", {
                 type: "vector",
                 tiles: [`${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`],
@@ -214,7 +218,7 @@ const  LayersPage = () => {
                 </div>
 
                 
-
+            <MapProvider>
                 {showForm && (
                     <LayerForm
                         initialData={editingLayer || undefined}
@@ -222,12 +226,15 @@ const  LayersPage = () => {
                         onClose={() => setShowForm(false)}
                     />
                 )}
+            </MapProvider>
+               
         </div>
     );
 }
 
 
 export default function SessionDataPage () {
+
     return (
         <SessionProvider>
             <MapProvider>
