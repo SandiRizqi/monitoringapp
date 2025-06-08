@@ -1,20 +1,22 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dropzone from '../common/Dropzone';
 import { Layer } from '../types/layers';
 import MapInstance from '../common/MapInstance';
 import { useMap } from '../context/MapProvider';
-import { DEFAULT_MAPVIEW } from '../conts';
+import { DEFAULT_MAPVIEW, BACKEND_URL } from '../conts';
 import { Notification } from '../common/Notification';
+import { useSession } from 'next-auth/react';
 
 type Props = {
   initialData?: Layer;
-  onSubmit: (layer: Layer) => Promise<void>; 
+  onSubmit: (layer: Layer) => Promise<void>;
   onClose: () => void;
 };
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
-  const{map, drawPolygon} = useMap();
+  const { map, drawPolygon, zoomToLayer } = useMap();
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form, setForm] = useState<Layer>(
     initialData || {
@@ -31,28 +33,9 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const onUpload = (coords: [number, number][]) => {
     // console.log('Uploaded coordinates:', coords);
     if (!map) return;
-    const bounds = coords.reduce(
-      (bbox, coord) => {
-        return [
-          [Math.min(bbox[0][0], coord[0]), Math.min(bbox[0][1], coord[1])], // Min values
-          [Math.max(bbox[1][0], coord[0]), Math.max(bbox[1][1], coord[1])], // Max values
-        ];
-      },
-      [
-        [Infinity, Infinity], // Min lng, lat
-        [-Infinity, -Infinity], // Max lng, lat
-      ]
-    );
-
-
 
     drawPolygon(coords, form);
-
-
-    map.fitBounds(bounds as [[number, number], [number, number]], {
-      padding: 5, // Add padding for visibility
-      duration: 0, // Smooth animation
-    });
+    zoomToLayer(coords);
 
     setForm((prev) => ({
       ...prev,
@@ -77,19 +60,78 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!form.geometry) {
-    Notification("Error", "You must input the geometry.");
-    return;
-  }
+    e.preventDefault();
+    if (!form.geometry) {
+      Notification("Error", "You must input the geometry.");
+      return;
+    }
 
-  setIsLoading(true);
-  try {
-    await onSubmit(form); // tunggu hingga selesai
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setIsLoading(true);
+    try {
+      await onSubmit(form); // tunggu hingga selesai
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDatabyId = async (id: string | undefined) => {
+      if (!id) return;
+      if (!session?.user?.token) return;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/data/user-aois/?id=${id}&geom=true`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${session.user.token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch layers');
+        const data = await res.json();
+        const coords: [number, number][] = data.features[0].geometry.coordinates[0];
+        const properties: Layer = data.features[0].properties;
+        drawPolygon(coords, properties);
+        zoomToLayer(coords);
+        setForm((prev) => ({
+          ...prev,
+          geometry: {
+            type: "Polygon",
+            coordinates: [coords]
+          }
+        }));
+
+      } catch (error) {
+        if (error instanceof Error) {
+          Notification("Error", error.message);
+        } else {
+          Notification("Error", "Something went wrong");
+        }
+      }
+
+    }
+
+
+    if (!map) return;
+
+    const handleLoad = () => {
+      if (initialData) {
+        fetchDatabyId(initialData.id);
+      }
+    };
+
+    if (!map.loaded()) {
+      map.once('load', handleLoad);
+    } else {
+      handleLoad();
+    }
+
+    return () => {
+      map.off('load', handleLoad);
+    };
+
+  }, [map])
 
 
   return (

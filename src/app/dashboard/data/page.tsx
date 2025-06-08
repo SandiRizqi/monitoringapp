@@ -10,12 +10,14 @@ import { Notification } from '@/components/common/Notification';
 import { useSession } from 'next-auth/react';
 import { SessionProvider } from 'next-auth/react';
 import { BACKEND_URL } from '@/components/conts';
+import { useMap } from '@/components/context/MapProvider';
 
 
 
 
 const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
+    const {map} = useMap();
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -132,9 +134,61 @@ const  LayersPage = () => {
         }
     }, [status, session]);
 
+
+    useEffect(() => {
+        if (!map) return;
+        if (!session?.user?.token) return;
+
+        const handleLoad = () => {
+            if (map.getSource("aois")) return;
+            map.addSource("aois", {
+                type: "vector",
+                tiles: [`${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`],
+                minzoom: 0,
+                maxzoom: 22
+            });
+
+            map.addLayer({
+                id: "aois-layer",
+                type: "fill",
+                source: "aois",
+                "source-layer": "layer",
+                paint: {
+                    "fill-color": ["get", "fill_color"],
+                    "fill-opacity": 0.5,
+                    "fill-outline-color": ["get", "stroke_color"]
+                }
+            });
+
+            // Layer baru untuk stroke (garis tepi) pakai tipe line
+            map.addLayer({
+                id: "aois-stroke-layer",
+                type: "line",
+                source: "aois",
+                "source-layer": "layer",
+                paint: {
+                    "line-color": ["get", "stroke_color"],
+                    "line-width": ["get", "stroke_width"]
+                }
+            });
+        };
+
+        if (!map.loaded()) {
+            map.once('load', handleLoad);
+        } else {
+            handleLoad();
+        }
+
+        return () => {
+            map.off('load', handleLoad);
+        };
+    }, [map, session, status])
+
+
+
+
     return (
         <div className='flex flex-col'>
-            <MapProvider>
                 <div className="relative overflow-hidden shadow w-full h-[40vh]">
                     <MapInstance
                         id="map-layer-preview"
@@ -168,7 +222,6 @@ const  LayersPage = () => {
                         onClose={() => setShowForm(false)}
                     />
                 )}
-            </MapProvider>
         </div>
     );
 }
@@ -177,7 +230,9 @@ const  LayersPage = () => {
 export default function SessionDataPage () {
     return (
         <SessionProvider>
-            <LayersPage/>
+            <MapProvider>
+                <LayersPage/>
+            </MapProvider>
         </SessionProvider>
     )
 }

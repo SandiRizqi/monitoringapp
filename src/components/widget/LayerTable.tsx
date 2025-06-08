@@ -106,7 +106,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
       </table>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {currentLayers.length >= 0 && (
         <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t">
           <span className="text-sm text-gray-600">
             Page {currentPage} of {totalPages}

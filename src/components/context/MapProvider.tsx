@@ -12,6 +12,7 @@ type MapContextType = {
   loading: boolean;
   setLoadingMap: React.Dispatch<React.SetStateAction<boolean>>;
   drawPolygon: (oords: [number, number][], layer: Layer) => void
+  zoomToLayer: (oords: [number, number][]) => void
 };
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -27,6 +28,27 @@ export const useMap = () => {
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [loading, setLoadingMap] = useState<boolean>(false);
+
+  const zoomToLayer = (coords: [number, number][]) => {
+    if (!map) return;
+    const bounds = coords.reduce(
+      (bbox, coord) => {
+        return [
+          [Math.min(bbox[0][0], coord[0]), Math.min(bbox[0][1], coord[1])], // Min values
+          [Math.max(bbox[1][0], coord[0]), Math.max(bbox[1][1], coord[1])], // Max values
+        ];
+      },
+      [
+        [Infinity, Infinity], // Min lng, lat
+        [-Infinity, -Infinity], // Max lng, lat
+      ]
+    );
+
+    map.fitBounds(bounds as [[number, number], [number, number]], {
+      padding: 5, // Add padding for visibility
+      duration: 0, // Smooth animation
+    });
+  }
 
 
   const drawPolygon = (coords: [number, number][], layer: Layer) => {
@@ -87,7 +109,9 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
 
   return (
-    <MapContext.Provider value={{ map, setMap, loading, setLoadingMap, drawPolygon }}>
+    <MapContext.Provider value={{ map, setMap, loading, setLoadingMap, drawPolygon,
+      zoomToLayer
+     }}>
       {children}
       {loading && <LoadingScreen />}
     </MapContext.Provider>
