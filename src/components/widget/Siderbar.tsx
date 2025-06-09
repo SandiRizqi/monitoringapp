@@ -48,7 +48,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-    fixed top-0 left-0 h-screen bg-white shadow-md w-64 z-60 transform transition-transform duration-300
+    fixed top-0 left-0 h-screen bg-white shadow-md w-64 z-80 transform transition-transform duration-300
     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
     md:translate-x-0 md:static
   `}
@@ -58,7 +58,7 @@ export default function Sidebar() {
           <span className="text-2xl font-bold text-indigo-600">Dashboard</span>
           {/* Close Button visible only on mobile */}
           <button
-            className="md:hidden text-gray-500 hover:text-gray-800 p-2 bg-white rounded-md shadow-xs"
+            className="md:hidden text-gray-500 hover:text-gray-800 p-2 bg-white rounded-md shadow-sm z-80 cursor-pointer"
             onClick={() => setIsOpen(false)}
           >
             <X size={20} />
@@ -93,7 +93,7 @@ export default function Sidebar() {
       {/* Toggle Button (only when sidebar hidden on mobile) */}
       {!isOpen && (
         <button
-          className="md:hidden absolute top-4 left-4  p-2 bg-white rounded-md shadow-xs z-50 text-gray-500"
+          className="md:hidden absolute top-4 left-4  p-2 bg-white rounded-md shadow-md z-70 text-gray-500 cursor-pointer"
           onClick={() => setIsOpen(true)}
         >
           <Menu size={24} />

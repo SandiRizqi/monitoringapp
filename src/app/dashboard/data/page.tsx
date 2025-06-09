@@ -152,11 +152,7 @@ const  LayersPage = () => {
                 [95.0, -11.0],
                 [141.0, 6.0]
             ]);
-            addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`)
-            
-
-            // Layer baru untuk stroke (garis tepi) pakai tipe line
-            
+            addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);     
         };
 
         if (!map.loaded()) {

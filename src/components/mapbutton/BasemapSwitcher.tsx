@@ -74,6 +74,7 @@ export default function BasemapSwitcher({ onSelect }: Props) {
                 <img
                   src={bm.thumbnail}
                   alt={bm.name}
+                  loading="lazy"
                   className="w-full h-20 object-cover"
                 />
                 <div className="absolute bottom-0 w-full bg-black/50 text-white text-xs text-center py-1">

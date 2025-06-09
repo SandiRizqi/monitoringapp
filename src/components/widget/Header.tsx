@@ -21,7 +21,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="w-full h-16 bg-white shadow-md z-40 flex items-center px-4 sm:px-6 justify-between relative">
+    <header className="w-full h-16 bg-white shadow-md z-60 flex items-center px-4 sm:px-6 justify-between relative">
       <span></span>
 
       <div className="hidden sm:flex items-center space-x-3 relative" ref={dropdownRef}>
@@ -39,7 +39,7 @@ const Header = () => {
 
         {/* Dropdown */}
         {dropdownOpen && (
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded shadow-md py-2 z-50">
+          <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded shadow-md py-2 z-90">
             <div className="px-4 py-2 text-sm text-gray-600 font-medium border-b border-gray-100">
               {session?.user?.name}
             </div>

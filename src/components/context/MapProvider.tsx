@@ -69,11 +69,14 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (map.getSource(sourceId)) {
       (map.getSource(sourceId) as GeoJSONSource).setData(polygonData);
 
-      // Update style properties
       if (map.getLayer("polygon-fill")) {
-        map.setPaintProperty("polygon-fill", "fill-color", layer.fill_color || "#FFEDA0");
-        map.setPaintProperty("polygon-fill", "fill-opacity", 0.5); // Ubah sesuai kebutuhan
+      if (layer.fill_color && layer.fill_color !== "") {
+        map.setPaintProperty("polygon-fill", "fill-color", layer.fill_color);
+        map.setPaintProperty("polygon-fill", "fill-opacity", 0.5); // Adjust as needed
+      } else {
+        map.setPaintProperty("polygon-fill", "fill-opacity", 0); // Fully transparent
       }
+    }
 
       if (map.getLayer("polygon-border")) {
         map.setPaintProperty("polygon-border", "line-color", layer.stroke_color || "#000000");
@@ -89,8 +92,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         type: "fill",
         source: sourceId,
         paint: {
-          "fill-color": layer.fill_color || "#FFEDA0",
-          "fill-opacity": 0.5,
+          "fill-color": layer.fill_color || "#000000", // Default, won't matter if opacity is 0
+          "fill-opacity": layer.fill_color && layer.fill_color !== "" ? 0.5 : 0,
         },
       });
 
