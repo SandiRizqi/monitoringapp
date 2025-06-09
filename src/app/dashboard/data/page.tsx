@@ -132,7 +132,7 @@ const  LayersPage = () => {
         if (status === 'authenticated') {
             fetchLayers();
         }
-    }, [status, session]);
+    }, [status]);
 
 
     useEffect(() => {

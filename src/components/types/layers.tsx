@@ -34,8 +34,8 @@ export interface Layer {
   name: string;
   description?: string;
   srid?: number;
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string | undefined;
+  updated_at?: string | undefined;
   fill_color?: string;
   stroke_color?: string;
   stroke_width?: number;
