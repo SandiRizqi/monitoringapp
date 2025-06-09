@@ -13,6 +13,15 @@ const ITEMS_PER_PAGE = 5;
 
 export default function LayerTable({ layers, loading, onEdit, onDelete }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredLayers = layers.filter((layer) =>
+    `${layer.name} ${layer.description}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredLayers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentLayers = filteredLayers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   if (loading) {
     return (
@@ -57,13 +66,25 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
     );
   }
 
-  const totalPages = Math.ceil(layers.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentLayers = layers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
   return (
-    <div className="w-full mt-6 bg-white shadow rounded-lg overflow-x-auto">
-      <table className="min-w-full table-auto text-sm">
+    <div className="w-full mt-2 bg-white shadow rounded-lg overflow-x-auto">
+      {/* Search Input */}
+      <div className="flex justify-between items-center px-4 pt-2">
+        <h2 className="text-lg font-semibold">Layer List</h2>
+        <input
+          type="text"
+          placeholder="Search by name or description"
+          className="px-3 py-2 border rounded-md text-sm w-64"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+
+      {/* Table */}
+      <table className="min-w-full table-auto text-sm mt-2">
         <thead className="bg-gray-300 text-gray-700 uppercase">
           <tr>
             <th className="px-4 py-3 text-left">No</th>
@@ -82,14 +103,16 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           {currentLayers.map((layer, index) => (
             <tr key={layer.id} className="hover:bg-gray-50 transition border-t text-gray-800">
               <td className="px-4 py-2">{startIndex + index + 1}</td>
-              <td className="px-4 py-2">{layer.name}</td>
+              <td className="px-4 py-2 font-bold">{layer.name}</td>
               <td className="px-4 py-2 capitalize">{layer.geometry_type}</td>
-              <td className="px-4 py-2">{layer.description}</td>
+              <td className="px-4 py-2 max-w-[100px] truncate overflow-hidden whitespace-nowrap">{layer.description}</td>
               <td className="px-4 py-2">
-                <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: layer.fill_color  }}></span> {layer.fill_color}
+                <span className="inline-block w-4 h-4 rounded mr-1" style={{ backgroundColor: layer.fill_color }}></span>
+                {layer.fill_color}
               </td>
               <td className="px-4 py-2">
-                <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: layer.stroke_color }}></span> {layer.stroke_color}
+                <span className="inline-block w-4 h-4 rounded mr-1" style={{ backgroundColor: layer.stroke_color }}></span>
+                {layer.stroke_color}
               </td>
               <td className="px-4 py-2">{layer.stroke_width}</td>
               <td className="px-4 py-2 whitespace-nowrap">{new Date(layer.created_at ?? "").toLocaleString()}</td>
@@ -123,7 +146,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
       </table>
 
       {/* Pagination */}
-      {layers.length > 0 && (
+      {filteredLayers.length > 0 && (
         <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-3 bg-gray-50 border-t">
           <span className="text-sm text-gray-600 mb-2 sm:mb-0">
             Page {currentPage} of {totalPages}

@@ -22,6 +22,8 @@ export default function InfoButton({ id }: InfoButtonProps) {
         layers: [`${id}-layer`],
       });
 
+ 
+
       if (features.length > 0) {
         setFeatureProps(features[0].properties || null);
       } else {
@@ -69,7 +71,7 @@ export default function InfoButton({ id }: InfoButtonProps) {
           }}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className={`bg-white text-gray-800 border border-gray-300 shadow rounded-full p-2 transition cursor-pointer hover:bg-gray-100 ${
+          className={`bg-white text-gray-800 border border-gray-300 shadow-lg rounded-full p-2 transition cursor-pointer hover:bg-gray-100 ${
             active ? "ring-2 ring-indigo-500" : ""
           }`}
           aria-label="Info Mode"
@@ -94,8 +96,8 @@ export default function InfoButton({ id }: InfoButtonProps) {
               <tbody>
                 {Object.entries(featureProps).map(([key, value]) => (
                   <tr key={key} className="border-t hover:bg-gray-50">
-                    <td className="px-2 py-1 font-medium">{key}</td>
-                    <td className="px-2 py-1">
+                    <td className="px-2 py-1 ">{key.toUpperCase()}</td>
+                    <td className="px-2 py-1 max-w-[100px] truncate overflow-hidden whitespace-nowrap">
                       {key.includes("color") && typeof value === "string" ? (
                         <>
                           <span

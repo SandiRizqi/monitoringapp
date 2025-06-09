@@ -15,17 +15,20 @@ import MapControlsContainer from '@/components/mapbutton/MapControlsContainer';
 import ResetViewButton from '@/components/mapbutton/ResetView';
 import MeasureButton from '@/components/mapbutton/MeasureButton';
 import InfoButton from '@/components/mapbutton/InfoButton';
-
+import BasemapSwitcher from '@/components/mapbutton/BasemapSwitcher';
+import { DEFAULT_BASEMAP_STYLE } from '@/components/conts';
 
 
 
 const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
+    const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
     const {map, addVectorTile} = useMap();
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
     const {data: session, status } = useSession();
+
 
     const fetchLayers = async () => {
         if (!session?.user?.token) return;
@@ -175,7 +178,7 @@ const  LayersPage = () => {
                 <div className="relative overflow-hidden  shadow w-full h-[50vh]">
                     <MapInstance
                         id="map-layer-preview"
-                        mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
+                        mapStyle={basemap}
                         mapView={DEFAULT_MAPVIEW}
                     />
                     <MapControlsContainer>
@@ -183,11 +186,15 @@ const  LayersPage = () => {
                         <InfoButton id="user-aois" />
                         <ResetViewButton />
                     </MapControlsContainer>
+                    <div className="absolute top-2 left-2 z-50">
+                        <BasemapSwitcher onSelect={setBasemap}/>
+                    </div>
                 </div>
 
                 <div className='p-4'>
                     <div className="flex justify-between items-center">
-                    <h1 className="text-xl font-bold mb-4 text-gray-800">Data Layers</h1>
+                    {/* <h1 className="text-xl font-bold mb-4 text-gray-800">Data Layers</h1> */}
+                    <span></span>
                     <button
                         onClick={handleAdd}
                         className="bg-indigo-600 text-white px-4 py-2 rounded cursor-pointer shadow"

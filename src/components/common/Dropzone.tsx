@@ -1,6 +1,7 @@
 "use client"
 import { useDropzone } from "react-dropzone";
 import * as shapefile from "shapefile";
+import { UploadCloud } from "lucide-react"; 
 import { Geometry, Feature, FeatureCollection, GeoJsonProperties, Polygon, MultiPolygon } from 'geojson';
 import { Notification } from "./Notification";
 import JSZip from "jszip";
@@ -98,12 +99,20 @@ const Dropzone: React.FC<UploadZoneProps> = ({ onUpload }) => {
 
   return (
     <div
-      {...getRootProps()}
-      className="border-2 border-dashed border-gray-500 p-4 flex flex-col items-center cursor-pointer h-[100px] justify-center my-2"
-    >
-      <input {...getInputProps()} />
-      <span className="text-gray-400">Drag and drop or click to upload</span>
+  {...getRootProps()}
+  className="group relative border border-gray-500 rounded-md p-6 flex flex-col items-center justify-center cursor-pointer h-[160px] bg-gray-50 hover:shadow-lg hover:bg-white transition-all duration-300 ease-in-out"
+>
+  <input {...getInputProps()} />
+  <div className="flex flex-col items-center space-y-2">
+    <UploadCloud className="w-10 h-10 text-gray-400 group-hover:text-blue-500 transition-colors duration-200" />
+    <div className="text-center">
+      <p className="text-gray-600 text-sm font-medium group-hover:text-blue-600">
+        Click to upload or drag & drop
+      </p>
+      <p className="text-gray-400 text-xs">Shapefile(zip), KML, or GeoJSON</p>
     </div>
+  </div>
+</div>
   );
 };
 

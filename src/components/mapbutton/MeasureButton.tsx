@@ -140,7 +140,7 @@ export default function MeasureButton() {
         onClick={startMeasurement}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className={`bg-white text-gray-800 border border-gray-300 shadow rounded-full p-2 hover:bg-gray-100 transition cursor-pointer ${
+        className={`bg-white text-gray-800 border border-gray-300 shadow-lg rounded-full p-2 hover:bg-gray-100 transition cursor-pointer ${
           isDrawing ? "ring-2 ring-indigo-400" : ""
         }`}
         aria-label="Measure"

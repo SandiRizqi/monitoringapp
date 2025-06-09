@@ -7,6 +7,9 @@ import { useMap } from '../context/MapProvider';
 import { DEFAULT_MAPVIEW, BACKEND_URL } from '../conts';
 import { Notification } from '../common/Notification';
 import { useSession } from 'next-auth/react';
+import BasemapSwitcher from '../mapbutton/BasemapSwitcher';
+import { DEFAULT_BASEMAP_STYLE } from '../conts';
+
 
 type Props = {
   initialData?: Layer;
@@ -16,6 +19,7 @@ type Props = {
 
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const { map, drawPolygon, zoomToLayer } = useMap();
+  const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form, setForm] = useState<Layer>(
@@ -175,7 +179,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
                 value={form.fill_color || "#ffffff"} // fallback value
                 onChange={handleChange}
                 disabled={form.fill_color === ''}
-                className="h-6 w-12 shadow-md rounded-md cursor-pointer disabled:opacity-50"
+                className="h-6 w-20 shadow-md rounded-md cursor-pointer disabled:opacity-50"
               />
               {form.fill_color && (
                 <span className="text-sm text-gray-500">{form.fill_color}</span>
@@ -198,17 +202,17 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
             </button>
           </div>
 
-          <label className="mb-1">Stroke Color</label>
+          <label className="mb-1 text-sm font-medium text-gray-700">Stroke Color</label>
           <input
             name="stroke_color"
             type="color"
             value={form.stroke_color}
             onChange={handleChange}
-            className="w-12 h-6 shadow-md rounded-md cursor-pointer mb-4"
+            className="w-20 h-6 shadow-md rounded-md cursor-pointer mb-4"
             required
           />
 
-          <label className="mb-1">Stroke Width</label>
+          <label className="mb-1 text-sm font-medium text-gray-700">Stroke Width</label>
           <input
             name="stroke_width"
             type="number"
@@ -217,7 +221,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
             className="w-20 p-1 border rounded mb-4"
             min={0}
           />
-
+          <label className="mb-1 text-sm font-medium text-gray-700">Geometry File (shp/geojson/kml)</label>
           <Dropzone onUpload={onUpload} />
 
           <div className="mt-auto flex justify-end gap-2">
@@ -240,12 +244,15 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
         {/* Right: Map Preview */}
         <div className="w-1/2 bg-gray-100 rounded-lg">
-          <div className="w-full h-full border border-gray-300 rounded bg-white flex items-center justify-center">
+          <div className="w-full h-full border border-gray-300 rounded bg-white relative flex items-center justify-center">
             <MapInstance
               id="map-layer-upload-preview"
-              mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
+              mapStyle={basemap}
               mapView={DEFAULT_MAPVIEW}
             />
+            <div className="absolute top-2 left-2 z-50">
+                  <BasemapSwitcher onSelect={setBasemap}/>
+            </div>
           </div>
         </div>
       </div>

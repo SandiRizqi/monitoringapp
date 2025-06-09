@@ -22,7 +22,7 @@ export default function ResetViewButton() {
         onClick={handleClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className="bg-white text-gray-800 border border-gray-300 shadow rounded-full p-2 hover:bg-gray-100 transition cursor-pointer"
+        className="bg-white text-gray-800 border border-gray-300 shadow-lg rounded-full p-2 hover:bg-gray-100 transition cursor-pointer"
         aria-label="Reset View"
       >
         <RefreshCw size={15} className={isSpinning ? "animate-spin" : ""} />
