@@ -20,6 +20,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
         <table className="min-w-full table-auto">
           <thead className="bg-gray-300 text-gray-700 text-sm uppercase">
             <tr>
+              <th className="px-4 py-3 text-left">No</th>
               <th className="px-4 py-3 text-left">Name</th>
               <th className="px-4 py-3 text-left">Type</th>
               <th className="px-4 py-3 text-left">Description</th>
@@ -34,6 +35,9 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           <tbody>
             {[...Array(5)].map((_, i) => (
               <tr key={i} className="border-t">
+                <td className="px-4 py-3">
+                  <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+                </td>
                 {[...Array(8)].map((_, j) => (
                   <td key={j} className="px-4 py-3">
                     <div className="w-full h-4 bg-gray-200 rounded animate-pulse" />
@@ -62,6 +66,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
       <table className="min-w-full table-auto text-sm">
         <thead className="bg-gray-300 text-gray-700 uppercase">
           <tr>
+            <th className="px-4 py-3 text-left">No</th>
             <th className="px-4 py-3 text-left">Name</th>
             <th className="px-4 py-3 text-left">Type</th>
             <th className="px-4 py-3 text-left">Description</th>
@@ -74,13 +79,14 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           </tr>
         </thead>
         <tbody>
-          {currentLayers.map((layer) => (
+          {currentLayers.map((layer, index) => (
             <tr key={layer.id} className="hover:bg-gray-50 transition border-t text-gray-800">
+              <td className="px-4 py-2">{startIndex + index + 1}</td>
               <td className="px-4 py-2">{layer.name}</td>
               <td className="px-4 py-2 capitalize">{layer.geometry_type}</td>
               <td className="px-4 py-2">{layer.description}</td>
               <td className="px-4 py-2">
-                <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: layer.fill_color }}></span> {layer.fill_color}
+                <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: layer.fill_color  }}></span> {layer.fill_color}
               </td>
               <td className="px-4 py-2">
                 <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: layer.stroke_color }}></span> {layer.stroke_color}
@@ -108,7 +114,7 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           ))}
           {currentLayers.length === 0 && (
             <tr>
-              <td colSpan={9} className="text-center px-4 py-6 text-gray-500">
+              <td colSpan={10} className="text-center px-4 py-6 text-gray-500">
                 No layers found.
               </td>
             </tr>
@@ -124,14 +130,14 @@ export default function LayerTable({ layers, loading, onEdit, onDelete }: Props)
           </span>
           <div className="flex gap-2">
             <button
-              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600"
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600 cursor-pointer"
               onClick={() => setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
             >
               Previous
             </button>
             <button
-              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600"
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 text-gray-600 cursor-pointer"
               onClick={() => setCurrentPage((prev) => prev + 1)}
               disabled={currentPage === totalPages}
             >

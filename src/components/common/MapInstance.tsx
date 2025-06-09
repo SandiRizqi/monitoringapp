@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { useMap } from "../context/MapProvider";
-import LoadingScreen from "./LoadingScreen";
+import LoadingMap from "./LoadingMap";
 
 
 
@@ -102,7 +102,7 @@ const MapInstance: React.FC<MapInstanceProps> = ({ id, className, style, mapStyl
 
 
   return <div id={id} className={`relative w-full h-full ${className}`} ref={mapContainerRef} style={style}>
-    {isLoading && <LoadingScreen />}
+    {isLoading && <LoadingMap />}
   </div>;
 };
 

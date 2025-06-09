@@ -163,14 +163,40 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
 
 
-          <label className="mb-1">Fill Color</label>
-          <input
-            name="fill_color"
-            type="color"
-            value={form.fill_color}
-            onChange={handleChange}
-            className="w-full h-6 border rounded mb-4"
-          />
+          {/* Fill Color */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fill Color
+            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <input
+                name="fill_color"
+                type="color"
+                value={form.fill_color || "#ffffff"} // fallback value
+                onChange={handleChange}
+                disabled={form.fill_color === ''}
+                className="h-6 w-12 shadow-md rounded-md cursor-pointer disabled:opacity-50"
+              />
+              {form.fill_color && (
+                <span className="text-sm text-gray-500">{form.fill_color}</span>
+              )}
+              {form.fill_color === '' && (
+                <span className="text-sm text-gray-400 italic">Transparent</span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                setForm((prev) => ({
+                  ...prev,
+                  fill_color: prev.fill_color === '' ? '#FFEDA0' : '', // toggle between transparent and default
+                }))
+              }
+              className="text-xs text-blue-600 underline hover:text-blue-800 cursor-pointer"
+            >
+              {form.fill_color === '' ? 'Set Color' : 'Make Transparent'}
+            </button>
+          </div>
 
           <label className="mb-1">Stroke Color</label>
           <input
@@ -178,7 +204,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
             type="color"
             value={form.stroke_color}
             onChange={handleChange}
-            className="w-full h-6 border rounded mb-4"
+            className="w-12 h-6 shadow-md rounded-md cursor-pointer mb-4"
             required
           />
 
@@ -188,7 +214,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
             type="number"
             value={form.stroke_width}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-20 p-1 border rounded mb-4"
             min={0}
           />
 

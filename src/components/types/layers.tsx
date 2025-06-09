@@ -36,7 +36,7 @@ export interface Layer {
   srid?: number;
   created_at?: string | undefined;
   updated_at?: string | undefined;
-  fill_color?: string;
+  fill_color?: string ;
   stroke_color?: string;
   stroke_width?: number;
   marker_size?: number;

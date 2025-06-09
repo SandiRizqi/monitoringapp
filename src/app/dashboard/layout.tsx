@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Sidebar from "@/components/widget/Siderbar";
+import Footer from "@/components/widget/Footer";
 import SessionHeader from "@/components/widget/SessionHeader";
 import "../../style/globals.css"
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -40,6 +41,7 @@ export default function Layout({
             <main className="flex-1 overflow-y-auto">
               {children}
             </main>
+            <Footer />
           </div>
         </div>
       </body>

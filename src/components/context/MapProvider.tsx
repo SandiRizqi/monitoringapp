@@ -1,6 +1,6 @@
 "use client"
 import React, { createContext, useContext, useState } from "react";
-import LoadingScreen from "../common/LoadingScreen";
+import LoadingMap from "../common/LoadingMap";
 import maplibregl from "maplibre-gl";
 import { Layer } from "../types/layers";
 import { GeoJSONSource } from 'maplibre-gl';
@@ -13,6 +13,7 @@ type MapContextType = {
   setLoadingMap: React.Dispatch<React.SetStateAction<boolean>>;
   drawPolygon: (oords: [number, number][], layer: Layer) => void
   zoomToLayer: (oords: [number, number][]) => void
+  addVectorTile: (id: string, url: string) => void
 };
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -107,13 +108,54 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
 
+  const addVectorTile = (id: string, url: string) => {
+    if (!map) return;
+    if (map.getSource(id)) return;
+    map.addSource(id, {
+      type: "vector",
+      tiles: [`${url}`],
+      minzoom: 0,
+      maxzoom: 22
+    });
+
+    map.addLayer({
+      id: `${id}-layer`,
+      type: "fill",
+      source: id,
+      "source-layer": "layer",
+      paint: {
+        "fill-color": [
+          "case",
+          ["==", ["get", "fill_color"], ""],
+          "rgba(0,0,0,0)",
+          ["get", "fill_color"]
+        ],
+        "fill-opacity": 0.5,
+        "fill-outline-color": ["get", "stroke_color"]
+      }
+    })
+
+    map.addLayer({
+      id: `${id}-stroke-layer`,
+      type: "line",
+      source: id,
+      "source-layer": "layer",
+      paint: {
+        "line-color": ["get", "stroke_color"],
+        "line-width": ["get", "stroke_width"]
+      }
+    });
+  }
+
+
 
   return (
     <MapContext.Provider value={{ map, setMap, loading, setLoadingMap, drawPolygon,
-      zoomToLayer
+      zoomToLayer,
+      addVectorTile,
      }}>
       {children}
-      {loading && <LoadingScreen />}
+      {loading && <LoadingMap />}
     </MapContext.Provider>
   );
 };

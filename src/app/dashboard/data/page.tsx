@@ -11,13 +11,17 @@ import { useSession } from 'next-auth/react';
 import { SessionProvider } from 'next-auth/react';
 import { BACKEND_URL } from '@/components/conts';
 import { useMap } from '@/components/context/MapProvider';
+import MapControlsContainer from '@/components/mapbutton/MapControlsContainer';
+import ResetViewButton from '@/components/mapbutton/ResetView';
+import MeasureButton from '@/components/mapbutton/MeasureButton';
+import InfoButton from '@/components/mapbutton/InfoButton';
 
 
 
 
 const  LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
-    const {map} = useMap();
+    const {map, addVectorTile} = useMap();
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -145,36 +149,11 @@ const  LayersPage = () => {
                 [95.0, -11.0],
                 [141.0, 6.0]
             ]);
-            map.addSource("aois", {
-                type: "vector",
-                tiles: [`${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`],
-                minzoom: 0,
-                maxzoom: 22
-            });
-
-            map.addLayer({
-                id: "aois-layer",
-                type: "fill",
-                source: "aois",
-                "source-layer": "layer",
-                paint: {
-                    "fill-color": ["get", "fill_color"],
-                    "fill-opacity": 0.5,
-                    "fill-outline-color": ["get", "stroke_color"]
-                }
-            });
+            addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`)
+            
 
             // Layer baru untuk stroke (garis tepi) pakai tipe line
-            map.addLayer({
-                id: "aois-stroke-layer",
-                type: "line",
-                source: "aois",
-                "source-layer": "layer",
-                paint: {
-                    "line-color": ["get", "stroke_color"],
-                    "line-width": ["get", "stroke_width"]
-                }
-            });
+            
         };
 
         if (!map.loaded()) {
@@ -193,12 +172,17 @@ const  LayersPage = () => {
 
     return (
         <div className='flex flex-col'>
-                <div className="relative overflow-hidden shadow w-full h-[40vh]">
+                <div className="relative overflow-hidden  shadow w-full h-[50vh]">
                     <MapInstance
                         id="map-layer-preview"
                         mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
                         mapView={DEFAULT_MAPVIEW}
                     />
+                    <MapControlsContainer>
+                        <MeasureButton />
+                        <InfoButton id="user-aois" />
+                        <ResetViewButton />
+                    </MapControlsContainer>
                 </div>
 
                 <div className='p-4'>
@@ -212,7 +196,7 @@ const  LayersPage = () => {
                     </button>
                 </div>
 
-                <div className='min-h-[40vh] my-2'>
+                <div className=' my-2'>
                     <LayerTable layers={layers} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
                 </div>
                 </div>

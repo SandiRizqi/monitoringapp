@@ -18,7 +18,7 @@ export function withoutAuth<P>(Component: ComponentType<P>) {
     }, [session, status, router]);
 
     if (status === "loading" || session) {
-      return <LoadingScreen />;
+      return <LoadingScreen z={60}/>;
     }
 
     return <Component {...props} />;

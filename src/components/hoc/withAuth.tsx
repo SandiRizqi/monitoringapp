@@ -18,7 +18,7 @@ export function withAuth<P>(Component: ComponentType<P>) {
     }, [session, status, router]);
 
     if (status === "loading" || !session) {
-      return <LoadingScreen />;
+      return <LoadingScreen z={90}/>;
     }
 
     return <Component {...props} />;
