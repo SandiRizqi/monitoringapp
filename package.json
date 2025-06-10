@@ -21,6 +21,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "react-tooltip": "^5.28.1",
+    "recharts": "^2.15.3",
     "shapefile": "^0.6.6",
     "sweetalert2": "^11.22.0"
   },
