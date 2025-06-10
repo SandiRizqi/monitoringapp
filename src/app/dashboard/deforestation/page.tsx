@@ -1,53 +1,54 @@
+"use client"
+
+import { useState } from "react";
 import MapInstance from "@/components/common/MapInstance";
 import { MapProvider } from "@/components/context/MapProvider";
 import DeforestationStats from "@/components/deforestation/DeforestationStats";
 import CompanyTable from "@/components/deforestation/CompanyTable";
-import AlertList from "@/components/deforestation/AlertList";
+// import AlertList from "@/components/deforestation/AlertList";
 import ChartDeforestation from "@/components/deforestation/ChartDeforestation";
 import DeforestationFilter from "@/components/deforestation/DeforestationFilter";
 import EventList from "@/components/deforestation/EventList";
+import { DEFAULT_MAPVIEW } from "@/components/conts";
+import { DEFAULT_BASEMAP_STYLE } from "@/components/conts";
+import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
 
 
 export default function DeforestationMonitoring() {
+  const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE)
 
-  const mapView = {
-    center: [106.8456, -6.2088] as [number, number], // Jakarta
-    zoom: 5, // Zoom out untuk melihat seluruh Indonesia
-    pitch: 0,
-    bearing: 0,
-  };
+
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-700">Monitoring Deforestation di Indonesia (2020-2025)</h1>
+      <div className="flex w-full  bg-white shadow rounded-md mb-2 items-center px-2 flex-row justify-between">
+        <h1 className="text-xl font-bold  text-gray-700">Deforestation Monitoring</h1>
+        <DeforestationFilter />
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
         {/* Peta */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-4 h-96 lg:h-auto text-gray-700">
+        <div className="relative lg:col-span-2 bg-white rounded-md shadow p-2 h-96 lg:h-auto text-gray-700">
           <MapProvider>
             <MapInstance
               id="deforestation-map"
-              mapStyle="https://api.maptiler.com/maps/streets/style.json?key=whs17VUkPAj2svtEn9LL"
-              mapView={mapView}
+              mapStyle={basemap}
+              mapView={DEFAULT_MAPVIEW}
             />
           </MapProvider>
+          <div className="absolute top-2 left-2 z-50">
+            <BasemapSwitcher onSelect={setBasemap} />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-6 text-gray-700 h-96 lg:h-full">
-          <DeforestationFilter />
+        <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
           <DeforestationStats />
           <CompanyTable />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-4 h-96 lg:h-auto text-gray-700">
-          <ChartDeforestation />
-        </div>
-
-        <div className="flex flex-col gap-6 text-gray-700 h-96 lg:h-full">
-          <AlertList />
-        </div>
+      <div className="grid grid-cols-1  gap-2 my-2 lg:items-stretch">
+        <ChartDeforestation />
       </div>
 
 

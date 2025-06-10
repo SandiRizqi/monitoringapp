@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 export default function DeforestationFilter() {
-  const [status, setStatus] = useState("HIGH");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -15,16 +14,8 @@ export default function DeforestationFilter() {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-white p-2 rounded-md shadow w-full max-w-xl mb-6">
-      <select
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none"
-      >
-        <option value="HIGH">HIGH</option>
-        <option value="LOW">LOW</option>
-      </select>
-
+    <div className="flex items-center gap-1 max-w-xl my-2 justify-end">
+      
       <input
         type="date"
         value={startDate}

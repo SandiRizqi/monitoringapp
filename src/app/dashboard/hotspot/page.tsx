@@ -20,7 +20,7 @@ export default function DeforestationMonitoring() {
       <h1 className="text-2xl font-bold mb-6 text-gray-700">Monitoring Hotspot di Indonesia (2020-2025)</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-4 h-96 lg:h-auto text-gray-700">
+        <div className="lg:col-span-2 bg-white rounded-md shadow p-2 h-96 lg:h-auto text-gray-700">
           <MapProvider>
             <MapInstance
               id="deforestation-map"

@@ -26,9 +26,9 @@ const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
 
 export default function ChartDeforestation() {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1  lg:grid-cols-3 md:grid-cols-2 gap-2">
             {/* Bar Chart */}
-            <div className="bg-white p-4 rounded-xl shadow">
+            <div className="bg-white p-2 rounded-md shadow">
                 <h2 className="text-lg font-semibold mb-4">Bar Chart</h2>
                 <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={sampleData}>
@@ -43,7 +43,7 @@ export default function ChartDeforestation() {
             </div>
 
             {/* Pie Chart */}
-            <div className="bg-white p-4 rounded-xl shadow">
+            <div className="bg-white p-4 rounded-md shadow">
                 <h2 className="text-lg font-semibold mb-4">Pie Chart</h2>
                 <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
@@ -67,7 +67,7 @@ export default function ChartDeforestation() {
             </div>
 
             {/* Line Chart */}
-            <div className="bg-white p-4 rounded-xl shadow">
+            <div className="bg-white p-4 rounded-md shadow">
                 <h2 className="text-lg font-semibold mb-4">Line Chart</h2>
                 <ResponsiveContainer width="100%" height={250}>
                     <LineChart data={sampleData}>
