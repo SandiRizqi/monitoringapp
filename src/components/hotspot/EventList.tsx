@@ -2,14 +2,14 @@
 import React from "react";
 import { ZoomIn } from "lucide-react";
 
-interface Alert {
-    company: string;
-    date: string;
-    time: string;
-    distance: string;
-    satellite: string;
-    category: string;
-}
+// interface Alert {
+//     company: string;
+//     date: string;
+//     time: string;
+//     distance: string;
+//     satellite: string;
+//     category: string;
+// }
 
 export default function EventList() {
     const lastAlerts = [

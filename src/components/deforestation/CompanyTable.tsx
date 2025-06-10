@@ -1,10 +1,10 @@
 import React from "react";
 
-interface Company {
-    name: string;
-    year: string;
-    documents: string[];
-}
+// interface Company {
+//     name: string;
+//     year: string;
+//     documents: string[];
+// }
 
 export default function CompanyTable() {
     const companies = [

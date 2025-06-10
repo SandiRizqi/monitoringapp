@@ -1,12 +1,8 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import { useMap } from "../context/MapProvider";
 import LoadingMap from "./LoadingMap";
-
-
-
-
 
 export type ViewOptions = {
   center?: [number, number];
@@ -23,18 +19,14 @@ export type MapInstanceProps = {
   mapView?: ViewOptions;
 };
 
-
-
 const MapInstance: React.FC<MapInstanceProps> = ({ id, className, style, mapStyle, mapView }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { map, setMap } = useMap();
 
-
-
-
-
-
+  const setLoaded = useCallback(() => {
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -51,23 +43,23 @@ const MapInstance: React.FC<MapInstanceProps> = ({ id, className, style, mapStyl
 
     setMap(mapInstance);
 
-
     return () => mapInstance.remove();
   }, [mapStyle, mapView?.bearing, mapView?.center, mapView?.pitch, mapView?.zoom, setMap]);
 
   useEffect(() => {
-    if(!map) return;
+    if (!map) return;
     
     if (map && mapView) {
       map.jumpTo(mapView);
-      map.on("load", setLoaded)
+      map.on("load", setLoaded);
     }
 
-    
-    
-    
-
-  }, [map]);
+    return () => {
+      if (map) {
+        map.off("load", setLoaded);
+      }
+    };
+  }, [map, mapView, setLoaded]);
 
   useEffect(() => {
     if (map && mapStyle) {
@@ -75,35 +67,23 @@ const MapInstance: React.FC<MapInstanceProps> = ({ id, className, style, mapStyl
     }
   }, [mapStyle, map]);
 
-
-
   useEffect(() => {
-        if (map) {
-            const handleResize = () => {
-                map.resize();
-            };
+    if (map) {
+      const handleResize = () => {
+        map.resize();
+      };
 
-            handleResize(); // Initial check
-            window.addEventListener("resize", handleResize);
-            return () => window.removeEventListener("resize", handleResize);
-        }
-    }, []);
+      handleResize(); // Initial check
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, [map]);
 
-
-  
-
-
-
-
-  function setLoaded () {
-    setIsLoading(false);
-  }
-
-
-
-  return <div id={id} className={`relative w-full h-full ${className}`} ref={mapContainerRef} style={style}>
-    {isLoading && <LoadingMap />}
-  </div>;
+  return (
+    <div id={id} className={`relative w-full h-full ${className}`} ref={mapContainerRef} style={style}>
+      {isLoading && <LoadingMap />}
+    </div>
+  );
 };
 
 export default MapInstance;

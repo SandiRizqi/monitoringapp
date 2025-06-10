@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Dropzone from '../common/Dropzone';
 import { Layer } from '../types/layers';
 import MapInstance from '../common/MapInstance';
@@ -9,7 +9,6 @@ import { Notification } from '../common/Notification';
 import { useSession } from 'next-auth/react';
 import BasemapSwitcher from '../mapbutton/BasemapSwitcher';
 import { DEFAULT_BASEMAP_STYLE } from '../conts';
-
 
 type Props = {
   initialData?: Layer;
@@ -36,7 +35,6 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   );
 
   const onUpload = (coords: [number, number][]) => {
-    // console.log('Uploaded coordinates:', coords);
     if (!map) return;
 
     drawPolygon(coords, form);
@@ -49,8 +47,6 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
         coordinates: [coords]
       }
     }));
-
-
   };
 
   const handleChange = (
@@ -73,54 +69,52 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
 
     setIsSaving(true);
     try {
-      await onSubmit(form); // tunggu hingga selesai
+      await onSubmit(form);
     } finally {
       setIsSaving(false);
     }
   };
 
-  useEffect(() => {
-    const fetchDatabyId = async (id: string | undefined) => {
-      if (!id) return;
-      if (!session?.user?.token) return;
-      setIsLoading(true);
+  const fetchDatabyId = useCallback(async (id: string | undefined) => {
+    if (!id) return;
+    if (!session?.user?.token) return;
+    setIsLoading(true);
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/data/user-aois/?id=${id}&geom=true`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${session.user.token}`,
-          },
-        });
+    try {
+      const res = await fetch(`${BACKEND_URL}/data/user-aois/?id=${id}&geom=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${session.user.token}`,
+        },
+      });
 
-        if (!res.ok) throw new Error('Failed to fetch layers');
-        const data = await res.json();
-        const coords: [number, number][] = data.features[0].geometry.coordinates[0];
-        const properties: Layer = data.features[0].properties;
-        drawPolygon(coords, properties);
-        zoomToLayer(coords);
-        setForm((prev) => ({
-          ...prev,
-          geometry: {
-            type: "Polygon",
-            coordinates: [coords]
-          }
-        }));
-
-      } catch (error) {
-        if (error instanceof Error) {
-          Notification("Error", error.message);
-        } else {
-          Notification("Error", "Something went wrong");
+      if (!res.ok) throw new Error('Failed to fetch layers');
+      const data = await res.json();
+      const coords: [number, number][] = data.features[0].geometry.coordinates[0];
+      const properties: Layer = data.features[0].properties;
+      drawPolygon(coords, properties);
+      zoomToLayer(coords);
+      setForm((prev) => ({
+        ...prev,
+        geometry: {
+          type: "Polygon",
+          coordinates: [coords]
         }
-      } finally {
-        setIsLoading(false);
+      }));
+
+    } catch (error) {
+      if (error instanceof Error) {
+        Notification("Error", error.message);
+      } else {
+        Notification("Error", "Something went wrong");
       }
-
+    } finally {
+      setIsLoading(false);
     }
+  }, [session?.user?.token, drawPolygon, zoomToLayer]);
 
-
+  useEffect(() => {
     if (!map) return;
 
     const handleLoad = () => {
@@ -139,15 +133,11 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
       map.off('load', handleLoad);
     };
 
-  }, [map])
-
-
-
-
+  }, [map, initialData, fetchDatabyId]);
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-60 text-gray-800 p-4">
-      <div className="bg-white p-6 rounded-lg shadow-lg  w-full max-w-5xl h-[80vh] overflow-hidden flex gap-6">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl h-[80vh] overflow-hidden flex gap-6">
 
         {isLoading ? (
           <div className="w-1/2 flex flex-col relative">
@@ -208,8 +198,6 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
               rows={3}
             />
 
-
-
             {/* Fill Color */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,7 +207,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
                 <input
                   name="fill_color"
                   type="color"
-                  value={form.fill_color || "#ffffff"} // fallback value
+                  value={form.fill_color || "#ffffff"}
                   onChange={handleChange}
                   disabled={form.fill_color === ''}
                   className="h-6 w-20 shadow-md rounded-md cursor-pointer disabled:opacity-50"
@@ -236,7 +224,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
                 onClick={() =>
                   setForm((prev) => ({
                     ...prev,
-                    fill_color: prev.fill_color === '' ? '#FFEDA0' : '', // toggle between transparent and default
+                    fill_color: prev.fill_color === '' ? '#FFEDA0' : '',
                   }))
                 }
                 className="text-xs text-blue-600 underline hover:text-blue-800 cursor-pointer"
@@ -284,10 +272,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
               </button>
             </div>
           </form>
-        )
-        } 
-
-        
+        )}
 
         {/* Right: Map Preview */}
         <div className="w-1/2 bg-gray-100 rounded-lg">
@@ -298,7 +283,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
               mapView={DEFAULT_MAPVIEW}
             />
             <div className="absolute top-2 left-2 z-50">
-                  <BasemapSwitcher onSelect={setBasemap}/>
+              <BasemapSwitcher onSelect={setBasemap} />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layer } from '@/components/types/layers';
 import LayerTable from '@/components/widget/LayerTable';
 import LayerForm from '@/components/widget/LayerForm';
@@ -18,19 +18,16 @@ import InfoButton from '@/components/mapbutton/InfoButton';
 import BasemapSwitcher from '@/components/mapbutton/BasemapSwitcher';
 import { DEFAULT_BASEMAP_STYLE } from '@/components/conts';
 
-
-
-const  LayersPage = () => {
+const LayersPage = () => {
     const [layers, setLayers] = useState<Layer[]>([]);
     const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
-    const {map, addVectorTile} = useMap();
+    const { map, addVectorTile } = useMap();
     const [editingLayer, setEditingLayer] = useState<Layer | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
-    const {data: session, status } = useSession();
+    const { data: session, status } = useSession();
 
-
-    const fetchLayers = async () => {
+    const fetchLayers = useCallback(async () => {
         if (!session?.user?.token) return;
 
         setLoading(true);
@@ -52,7 +49,7 @@ const  LayersPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [session?.user?.token]);
 
     const handleAdd = () => {
         setEditingLayer(null);
@@ -76,18 +73,14 @@ const  LayersPage = () => {
                 },
             });
 
-            
-
             if (!res.ok) {
-                const result = await res.json(); // Par
-                // Extract `detail` or fallback to generic error message
+                const result = await res.json();
                 const message = result?.detail || 'Failed to save data';
                 throw new Error(message);
             }
 
             Notification("Success", "The data was deleted successfully");
         } catch (error) {
-            // console.error(error);
             if (error instanceof Error) {
                 Notification("Error", error.message);
             } else {
@@ -96,7 +89,6 @@ const  LayersPage = () => {
         } finally {
             await fetchLayers();
         }
-
     };
 
     const handleSave = async (layer: Layer) => {
@@ -108,13 +100,12 @@ const  LayersPage = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Token ${session.user.token}`,
                 },
-                body: JSON.stringify(layer),  // <-- This sends the form data
+                body: JSON.stringify(layer),
             });
 
-            const result = await res.json(); // Par
+            const result = await res.json();
 
             if (!res.ok) {
-                // Extract `detail` or fallback to generic error message
                 const message = result?.detail || 'Failed to save data';
                 throw new Error(message);
             }
@@ -122,7 +113,6 @@ const  LayersPage = () => {
             Notification("Success", "The data was saved successfully");
             setShowForm(false);
         } catch (error) {
-            // console.error(error);
             if (error instanceof Error) {
                 Notification("Error", error.message);
             } else {
@@ -133,14 +123,11 @@ const  LayersPage = () => {
         }
     };
 
-
-
     useEffect(() => {
         if (status === 'authenticated') {
             fetchLayers();
         }
-    }, [status]);
-
+    }, [status, fetchLayers]);
 
     useEffect(() => {
         if (!map) return;
@@ -152,7 +139,7 @@ const  LayersPage = () => {
                 [95.0, -11.0],
                 [141.0, 6.0]
             ]);
-            addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);     
+            addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
         };
 
         if (!map.loaded()) {
@@ -164,32 +151,28 @@ const  LayersPage = () => {
         return () => {
             map.off('load', handleLoad);
         };
-    }, [map, session, status])
-
-
-
+    }, [map, session, status, addVectorTile]);
 
     return (
         <div className='flex flex-col'>
-                <div className="relative overflow-hidden  shadow w-full h-[50vh]">
-                    <MapInstance
-                        id="map-layer-preview"
-                        mapStyle={basemap}
-                        mapView={DEFAULT_MAPVIEW}
-                    />
-                    <MapControlsContainer>
-                        <MeasureButton />
-                        <InfoButton id="user-aois" />
-                        <ResetViewButton />
-                    </MapControlsContainer>
-                    <div className="absolute top-2 left-2 z-50">
-                        <BasemapSwitcher onSelect={setBasemap}/>
-                    </div>
+            <div className="relative overflow-hidden shadow w-full h-[50vh]">
+                <MapInstance
+                    id="map-layer-preview"
+                    mapStyle={basemap}
+                    mapView={DEFAULT_MAPVIEW}
+                />
+                <MapControlsContainer>
+                    <MeasureButton />
+                    <InfoButton id="user-aois" />
+                    <ResetViewButton />
+                </MapControlsContainer>
+                <div className="absolute top-2 left-2 z-50">
+                    <BasemapSwitcher onSelect={setBasemap} />
                 </div>
+            </div>
 
-                <div className='p-4'>
-                    <div className="flex justify-between items-center">
-                    {/* <h1 className="text-xl font-bold mb-4 text-gray-800">Data Layers</h1> */}
+            <div className='p-4'>
+                <div className="flex justify-between items-center">
                     <span></span>
                     <button
                         onClick={handleAdd}
@@ -202,9 +185,8 @@ const  LayersPage = () => {
                 <div className=' my-2'>
                     <LayerTable layers={layers} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
                 </div>
-                </div>
+            </div>
 
-                
             <MapProvider>
                 {showForm && (
                     <LayerForm
@@ -214,18 +196,15 @@ const  LayersPage = () => {
                     />
                 )}
             </MapProvider>
-               
         </div>
     );
 }
 
-
-export default function SessionDataPage () {
-
+export default function SessionDataPage() {
     return (
         <SessionProvider>
             <MapProvider>
-                <LayersPage/>
+                <LayersPage />
             </MapProvider>
         </SessionProvider>
     )
