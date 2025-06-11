@@ -12,7 +12,8 @@ import EventList from "@/components/deforestation/EventList";
 import { DEFAULT_MAPVIEW } from "@/components/conts";
 import { DEFAULT_BASEMAP_STYLE } from "@/components/conts";
 import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
-
+import ResetViewButton from "@/components/mapbutton/ResetView";
+import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
 
 export default function DeforestationMonitoring() {
   const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE)
@@ -20,44 +21,50 @@ export default function DeforestationMonitoring() {
 
 
   return (
-    <div className="p-4">
-      <div className="flex w-full  bg-white shadow rounded-md mb-2 items-center px-2 flex-row justify-between">
-        <h1 className="text-xl font-bold  text-gray-700">Deforestation Monitoring</h1>
-        <DeforestationFilter />
-      </div>
+    <MapProvider>
+      <div className="p-4">
+        <div className="flex w-full  bg-white shadow rounded-md mb-2 items-center px-2 flex-row justify-between">
+          <h1 className="text-xl font-bold  text-gray-700">Deforestation Monitoring</h1>
+          <DeforestationFilter />
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
-        {/* Peta */}
-        <div className="relative lg:col-span-2 bg-white rounded-md shadow p-2 h-96 lg:h-auto text-gray-700">
-          <MapProvider>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
+          {/* Peta */}
+          <div className="relative lg:col-span-2 bg-white rounded-md  h-96 lg:h-auto text-gray-700 shadow-md">
+
             <MapInstance
               id="deforestation-map"
+              className="rounded-md"
               mapStyle={basemap}
               mapView={DEFAULT_MAPVIEW}
             />
-          </MapProvider>
-          <div className="absolute top-2 left-2 z-50">
-            <BasemapSwitcher onSelect={setBasemap} />
+
+            <MapControlsContainer>
+              <ResetViewButton />
+            </MapControlsContainer>
+            <div className="absolute top-2 left-2 z-50">
+              <BasemapSwitcher onSelect={setBasemap} />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
+            <DeforestationStats />
+            <CompanyTable />
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
-          <DeforestationStats />
-          <CompanyTable />
+        <div className="grid grid-cols-1  gap-2 my-2 lg:items-stretch">
+          <ChartDeforestation />
         </div>
-      </div>
-
-      <div className="grid grid-cols-1  gap-2 my-2 lg:items-stretch">
-        <ChartDeforestation />
-      </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-3 flex flex-col gap-6 text-gray-700">
-          <EventList />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-3 flex flex-col gap-6 text-gray-700">
+            <EventList />
+          </div>
         </div>
-      </div>
 
-    </div>
+      </div>
+    </MapProvider>
   );
 }

@@ -154,8 +154,8 @@ const LayersPage = () => {
     }, [map, session, status, addVectorTile]);
 
     return (
-        <div className='flex flex-col'>
-            <div className="relative overflow-hidden shadow w-full h-[50vh]">
+        <div className='flex flex-col p-4'>
+            <div className="relative overflow-hidden shadow-md w-full h-[50vh] rounded-md">
                 <MapInstance
                     id="map-layer-preview"
                     mapStyle={basemap}
@@ -171,7 +171,7 @@ const LayersPage = () => {
                 </div>
             </div>
 
-            <div className='p-4'>
+            <div className='mt-2'>
                 <div className="flex justify-between items-center">
                     <span></span>
                     <button
