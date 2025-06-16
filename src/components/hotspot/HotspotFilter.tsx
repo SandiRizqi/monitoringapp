@@ -15,7 +15,7 @@ export default function HotspotFilter() {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-white p-2 rounded-md shadow w-full max-w-xl mb-6">
+    <div className="flex items-center gap-2 bg-white p-2 rounded-md  w-full max-w-xl">
       <select
         value={status}
         onChange={(e) => setStatus(e.target.value)}
