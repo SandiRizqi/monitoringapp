@@ -1,24 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useConfig } from "../context/HotspotConfigProvider";
 
 
-const getTodayDate = () => {
-  return new Date().toISOString().slice(0, 10);
-};
 
 
 export default function HotspotFilter() {
-  // const [status, setStatus] = useState("HIGH");
-  const [startDate, setStartDate] = useState(getTodayDate());
-  const [endDate, setEndDate] = useState(getTodayDate());
+  const {config, setConfig} = useConfig();
 
-  const handleDownload = () => {
-    console.log("Download triggered with:", { startDate, endDate });
-    //
-    //
-    //
+  const handleQuery = () => {
+    console.log("Download triggered with:", {config});
   };
+
+  function handleChange(value: string, key: string) {
+  setConfig((prev) => ({ ...prev, [key]: value }));
+}
 
   return (
     <div className="flex items-center gap-1 max-w-xl my-2 justify-end">
@@ -34,25 +30,25 @@ export default function HotspotFilter() {
 
       <input
         type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
+        value={config.startdate}
+        onChange={(e) => handleChange(e.target.value, "startdate")}
         className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none cursor-pointer"
         placeholder="Start date"
       />
 
       <input
         type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
+        value={config.enddate}
+        onChange={(e) => handleChange(e.target.value, "enddate")}
         className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none cursor-pointer"
         placeholder="End date"
       />
 
       <button
-        onClick={handleDownload}
+        onClick={handleQuery}
         className="bg-indigo-600 text-white px-4 py-2 rounded text-sm cursor-pointer"
       >
-        Download
+        Query
       </button>
     </div>
   );
