@@ -8,9 +8,6 @@ export default function DeforestationFilter() {
 
   const handleDownload = () => {
     console.log("Download triggered with:", { status, startDate, endDate });
-    //
-    //
-    //
   };
 
   return (
@@ -20,7 +17,7 @@ export default function DeforestationFilter() {
         type="date"
         value={startDate}
         onChange={(e) => setStartDate(e.target.value)}
-        className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none"
+        className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none cursor-pointer"
         placeholder="Start date"
       />
 
@@ -28,13 +25,13 @@ export default function DeforestationFilter() {
         type="date"
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}
-        className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none"
+        className="border rounded px-3 py-2 text-sm text-gray-700 focus:outline-none cursor-pointer"
         placeholder="End date"
       />
 
       <button
         onClick={handleDownload}
-        className="bg-indigo-600 text-white px-4 py-2 rounded text-sm"
+        className="bg-indigo-600 text-white px-4 py-2 rounded text-sm cursor-pointer"
       >
         Download
       </button>
