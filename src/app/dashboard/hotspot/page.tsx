@@ -6,6 +6,7 @@ import MapInstance from "@/components/common/MapInstance";
 import HotspotStats from "@/components/hotspot/HotspotStats";
 import CompanyTable from "@/components/hotspot/CompanyTable";
 // import AlertList from "@/components/hotspot/AlertList";
+import { HotspotConfigProvider } from "@/components/context/HotspotConfigProvider";
 import { DEFAULT_BASEMAP_STYLE } from "@/components/conts";
 import ChartHotspot from "@/components/hotspot/ChartHotspot";
 import HotspotFilter from "@/components/hotspot/HotspotFilter";
@@ -19,16 +20,27 @@ import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
 import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
 import MeasureButton from "@/components/mapbutton/MeasureButton";
+import { useConfig } from "@/components/context/HotspotConfigProvider";
 
 
 const HotspotMonitoring = () => {
   const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
+  const {config} = useConfig();
   const { data: session, status } = useSession();
   const { map, addVectorTile } = useMap();
 
   const addHotspotTile = (id: string, url: string) => {
     if (!map) return;
-    if (map.getSource(id)) return;
+
+    const layerId = `${id}-layer`;
+
+    // Jika layer dan source sudah ada, hapus dulu untuk bisa di-update
+    if (map.getLayer(layerId)) {
+      map.removeLayer(layerId);
+    }
+    if (map.getSource(id)) {
+      map.removeSource(id);
+    }
 
     map.addSource(id, {
       type: "vector",
@@ -38,7 +50,7 @@ const HotspotMonitoring = () => {
     });
 
     map.addLayer({
-      id: `${id}-layer`,
+      id: layerId,
       type: "circle",
       source: id,
       "source-layer": "hotspot_alerts", // sesuaikan dengan nama layer di ST_AsMVT
@@ -63,6 +75,7 @@ const HotspotMonitoring = () => {
 
 
 
+
   useEffect(() => {
     if (!map) return;
     if (!session?.user?.token) return;
@@ -75,7 +88,7 @@ const HotspotMonitoring = () => {
       ]);
 
       addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
-      addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=2025-06-17&enddate=2025-06-17&token=${session.user.token}`);
+      addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
     };
 
     if (!map.loaded()) {
@@ -87,7 +100,17 @@ const HotspotMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [map, session, status, addVectorTile, addHotspotTile]);
+  }, [config, map, session, status, addVectorTile, addHotspotTile]);
+
+
+  // useEffect(() => {
+  //   if (!map) return;
+  //   if (!session?.user?.token) return;
+
+  //   if (map) {
+  //     addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
+  //   }
+  // },[config, map, session])
 
   return (
     <div className="p-4">
@@ -141,8 +164,10 @@ const HotspotMonitoring = () => {
 
 export default function Page() {
   return <SessionProvider>
-    <MapProvider>
+    <HotspotConfigProvider>
+      <MapProvider>
       <HotspotMonitoring />
     </MapProvider>
+    </HotspotConfigProvider>
   </SessionProvider>
 }
