@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useMap } from "@/components/context/MapProvider";
 import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
@@ -18,72 +18,76 @@ import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
 import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
 import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
+import MeasureButton from "@/components/mapbutton/MeasureButton";
 
 
 const HotspotMonitoring = () => {
   const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
-  const{data:session, status} = useSession();
-  const {map, addVectorTile} = useMap();
+  const { data: session, status } = useSession();
+  const { map, addVectorTile } = useMap();
 
   const addHotspotTile = (id: string, url: string) => {
-  if (!map) return;
-  if (map.getSource(id)) return;
+    if (!map) return;
+    if (map.getSource(id)) return;
 
-  map.addSource(id, {
-    type: "vector",
-    tiles: [`${url}`],
-    minzoom: 0,
-    maxzoom: 22,
-  });
+    map.addSource(id, {
+      type: "vector",
+      tiles: [`${url}`],
+      minzoom: 0,
+      maxzoom: 22,
+    });
 
-  map.addLayer({
-    id: `${id}-layer`,
-    type: "circle",
-    source: id,
-    "source-layer": "hotspot_alerts", // sesuai dengan nama layer di ST_AsMVT
-    paint: {
-      "circle-radius": 10,
-      "circle-color": [
-        "match",
-        ["get", "category"],
-        "AMAN", "#2ECC71",       // hijau
-        "PERHATIAN", "#F1C40F",  // kuning
-        "WASPADA", "#E67E22",    // oranye
-        "BAHAYA", "#E74C3C",     // merah
-        "#7F8C8D"                // default (abu-abu)
-      ],
-      "circle-stroke-color": "#ffffff",
-      "circle-stroke-width": 1,
-    },
-  });
-};
+    map.addLayer({
+      id: `${id}-layer`,
+      type: "circle",
+      source: id,
+      "source-layer": "hotspot_alerts", // sesuaikan dengan nama layer di ST_AsMVT
+      paint: {
+        "circle-radius": 4,
+        "circle-color": [
+          "match",
+          ["get", "category"],
+          "AMAN", "#2ECC71",         // hijau
+          "PERHATIAN", "#F1C40F",    // kuning
+          "WASPADA", "#E67E22",      // oranye
+          "BAHAYA", "#E74C3C",       // merah
+          "#B0BEC5"                  // default abu-abu
+        ],
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      },
+    });
+  };
+
+
 
 
 
   useEffect(() => {
-      if (!map) return;
-      if (!session?.user?.token) return;
-  
-      const handleLoad = () => {
-        if (map.getSource("hotspotalert-layer")) return;
-        map.fitBounds([
-          [95.0, -11.0],
-          [141.0, 6.0]
-        ]);
-        addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
-        addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?token=${session.user.token}`);
-      };
-  
-      if (!map.loaded()) {
-        map.once('load', handleLoad);
-      } else {
-        handleLoad();
-      }
-  
-      return () => {
-        map.off('load', handleLoad);
-      };
-    }, [map, session, status]);
+    if (!map) return;
+    if (!session?.user?.token) return;
+
+    const handleLoad = () => {
+      if (map.getSource("hotspotalert-layer")) return;
+      map.fitBounds([
+        [95.0, -11.0],
+        [141.0, 6.0]
+      ]);
+
+      addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
+      addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=2025-06-17&enddate=2025-06-17&token=${session.user.token}`);
+    };
+
+    if (!map.loaded()) {
+      map.once('load', handleLoad);
+    } else {
+      handleLoad();
+    }
+
+    return () => {
+      map.off('load', handleLoad);
+    };
+  }, [map, session, status]);
 
   return (
     <div className="p-4">
@@ -104,7 +108,8 @@ const HotspotMonitoring = () => {
           />
 
           <MapControlsContainer>
-            <InfoButton id="deforestation" />
+            <MeasureButton />
+            <InfoButton id="hotspotalert" />
             <ResetViewButton />
           </MapControlsContainer>
           <div className="absolute top-2 left-2 z-50">
@@ -134,7 +139,7 @@ const HotspotMonitoring = () => {
 }
 
 
-export default function Page () {
+export default function Page() {
   return <SessionProvider>
     <MapProvider>
       <HotspotMonitoring />

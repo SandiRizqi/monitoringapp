@@ -148,6 +148,24 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         "line-width": ["get", "stroke_width"]
       }
     });
+
+    map.addLayer({
+      id: `${id}-label-layer`,
+      type: "symbol",
+      source: id,
+      "source-layer": "layer",
+      layout: {
+        "text-field": ["get", "name"], // pastikan properti 'label' ada di data vektor
+        "text-size": 12,
+        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+        "text-anchor": "center",
+      },
+      paint: {
+        "text-color": ["get", "stroke_color"],
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2,
+      },
+    });
   }
 
 
