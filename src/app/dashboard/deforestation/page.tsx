@@ -80,7 +80,7 @@ const DeforestationMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [map, session, status]);
+  }, [map, session, status, addVectorTile, addDeforestationTile]);
 
 
 

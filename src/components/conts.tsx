@@ -12,3 +12,4 @@ export const DEFAULT_MAP_EXTEND : [[number, number], [number, number]] = [
             ]
 
 export const BACKEND_URL = "https://monitoringbackend-1075290745302.asia-southeast1.run.app"
+// export const BACKEND_URL = "http://localhost:8000"

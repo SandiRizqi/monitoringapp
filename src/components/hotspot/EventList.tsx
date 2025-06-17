@@ -1,136 +1,119 @@
 "use client";
-import React from "react";
-import { ZoomIn } from "lucide-react";
 
-// interface Alert {
-//     company: string;
-//     date: string;
-//     time: string;
-//     distance: string;
-//     satellite: string;
-//     category: string;
-// }
+import React, { useEffect, useState } from "react";
+import { ZoomIn } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { BACKEND_URL } from "@/components/conts";
+
+interface Alert {
+  company: string;
+  date: string;
+  time: string;
+  distance: string;
+  satellite: string;
+  category: string;
+  hotspot_id: string;
+  aoi_id: string;
+}
 
 export default function EventList() {
-    const lastAlerts = [
-        {
-            company: "PT BBB",
-            date: "2025-06-10",
-            time: "01:56",
-            distance: "8487.90",
-            satellite: "NASA-SNPP",
-            category: "Aman"
-        },
-        {
-            company: "PT EBL",
-            date: "2025-06-10",
-            time: "00:30",
-            distance: "17134.07",
-            satellite: "NOAA20",
-            category: "Aman"
-        },
-        {
-            company: "PT EBL",
-            date: "2025-06-10",
-            time: "00:37",
-            distance: "17121.56",
-            satellite: "NASA-NOAA20",
-            category: "Aman"
-        },
-        {
-            company: "PT EBL",
-            date: "2025-06-10",
-            time: "00:13",
-            distance: "17095.86",
-            satellite: "NASA-SNPP",
-            category: "Aman"
-        },
-    ];
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
 
-    const getCategoryColor = (category: string) => {
-        switch (category.toLowerCase()) {
-            case 'aman': return 'bg-green-100 text-green-800 border border-green-200';
-            case 'waspada': return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-            case 'bahaya': return 'bg-red-100 text-red-800 border border-red-200';
-            default: return 'bg-gray-100 text-gray-800 border border-gray-200';
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (!session?.user?.token) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/data/event-list/`, {
+          headers: {
+            'Authorization': `Token ${session.user.token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAlerts(data);
         }
+      } catch (error) {
+        console.error('Error fetching event data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleZoom = (company: string) => {
-        console.log(`Zooming to ${company} location on map`);
-        // Implementasi zoom ke titik maps
-    };
+    fetchEventData();
+  }, [session]);
 
-    return (
-        <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-800">List of Events</h2>
-            </div>
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'aman':
+        return 'bg-green-100 text-green-800 border border-green-200';
+      case 'perhatian':
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+      case 'waspada':
+        return 'bg-orange-100 text-orange-800 border border-orange-200';
+      case 'bahaya':
+        return 'bg-red-100 text-red-800 border border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  };
 
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                COMP
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                DATE
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                TIME
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                DIST (m)
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                SAT
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                CAT
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ACTION
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {lastAlerts.map((alert, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {alert.company}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {alert.date}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {alert.time}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {alert.distance}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {alert.satellite}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-md ${getCategoryColor(alert.category)}`}>
-                                        {alert.category}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <button
-                                        onClick={() => handleZoom(alert.company)}
-                                        className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-                                    >
-                                        <ZoomIn className="w-4 h-4" />
-                                        Zoom
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
+  const handleZoom = (company: string, aoiId: string) => {
+    console.log(`Zooming to ${company} (AOI: ${aoiId}) location on map`);
+    // Implementasi zoom ke titik maps
+  };
+
+  if (loading) {
+    return <div className="p-4">Loading recent events...</div>;
+  }
+
+  return (
+    <div className="bg-white p-4 rounded-lg shadow">
+      <h3 className="text-lg font-semibold mb-4">Recent Hotspot Events</h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-2 py-2 text-left">COMP</th>
+              <th className="px-2 py-2 text-left">DATE</th>
+              <th className="px-2 py-2 text-left">TIME</th>
+              <th className="px-2 py-2 text-left">DIST (m)</th>
+              <th className="px-2 py-2 text-left">SAT</th>
+              <th className="px-2 py-2 text-left">CAT</th>
+              <th className="px-2 py-2 text-left">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            {alerts.map((alert, index) => (
+              <tr key={index} className="border-b hover:bg-gray-50">
+                <td className="px-2 py-2 font-medium">{alert.company}</td>
+                <td className="px-2 py-2">{alert.date}</td>
+                <td className="px-2 py-2">{alert.time}</td>
+                <td className="px-2 py-2">{alert.distance}</td>
+                <td className="px-2 py-2 text-xs">{alert.satellite}</td>
+                <td className="px-2 py-2">
+                  <span className={`px-2 py-1 rounded-full text-xs ${getCategoryColor(alert.category)}`}>
+                    {alert.category}
+                  </span>
+                </td>
+                <td className="px-2 py-2">
+                  <button
+                    onClick={() => handleZoom(alert.company, alert.aoi_id)}
+                    className="p-1 hover:bg-gray-200 rounded"
+                    title="Zoom to location"
+                  >
+                    <ZoomIn size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }

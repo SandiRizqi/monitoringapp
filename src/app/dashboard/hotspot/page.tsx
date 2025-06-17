@@ -87,7 +87,7 @@ const HotspotMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [map, session, status]);
+  }, [map, session, status, addVectorTile, addHotspotTile]);
 
   return (
     <div className="p-4">
