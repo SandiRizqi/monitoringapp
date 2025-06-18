@@ -21,6 +21,7 @@ import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
 import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/HotspotConfigProvider";
+// import Image from "next/image"; // Perbaiki import Image
 
 
 const HotspotMonitoring = () => {
