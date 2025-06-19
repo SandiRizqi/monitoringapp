@@ -1,3 +1,4 @@
+//src/app/dashboard/hotspot/page.tsx
 "use client"
 import { useEffect, useState } from "react";
 import { useMap } from "@/components/context/MapProvider";
