@@ -17,6 +17,7 @@ import { DEFAULT_MAPVIEW } from "@/components/conts";
 import { SessionProvider } from "next-auth/react";
 import { MapProvider } from "@/components/context/MapProvider";
 import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
+import MapFunctionContainer from "@/components/mapbutton/MapFunctionContainer";
 import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
 import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
@@ -128,20 +129,24 @@ const HotspotMonitoring = () => {
 
           <MapInstance
             id="deforestation-map"
-            className="rounded-md"
+            className="rounded-md min-h-[50vh]"
             mapStyle={basemap}
             mapView={DEFAULT_MAPVIEW}
           />
 
           <MapControlsContainer>
-            <VerificationButton id="hotspotalert" />
             <MeasureButton />
             <InfoButton id="hotspotalert" />
             <ResetViewButton />
           </MapControlsContainer>
+
+          <MapFunctionContainer>
+            <VerificationButton id="hotspotalert" type="hotspotform" />
+          </MapFunctionContainer>
           <div className="absolute top-2 left-2 z-50">
             <BasemapSwitcher onSelect={setBasemap} />
           </div>
+          
         </div>
 
         <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
