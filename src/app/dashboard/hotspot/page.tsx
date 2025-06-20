@@ -1,6 +1,6 @@
 //src/app/dashboard/hotspot/page.tsx
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMap } from "@/components/context/MapProvider";
 import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
@@ -28,10 +28,15 @@ import VerificationButton from "@/components/mapbutton/VerificationButton";
 
 
 const HotspotMonitoring = () => {
-  const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
-  const {config} = useConfig();
+  // const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
+  const { config } = useConfig();
   const { data: session, status } = useSession();
   const { map, addVectorTile } = useMap();
+
+  const handleChangeBasemap = (URL: string) => {
+    if (!map) return;
+    map.setStyle(URL, { diff: false });
+  }
 
   const addHotspotTile = (id: string, url: string) => {
     if (!map) return;
@@ -84,6 +89,12 @@ const HotspotMonitoring = () => {
     if (!map) return;
     if (!session?.user?.token) return;
 
+    const handleStyleLoad = () => {
+      addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
+      addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
+    };
+
+
     const handleLoad = () => {
       if (map.getSource("hotspotalert-layer")) return;
       map.fitBounds([
@@ -91,18 +102,25 @@ const HotspotMonitoring = () => {
         [141.0, 6.0]
       ]);
 
-      addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
-      addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
+      handleStyleLoad();
     };
+
 
     if (!map.loaded()) {
       map.once('load', handleLoad);
     } else {
       handleLoad();
-    }
+    };
+
+
+    map.on("style.load", handleStyleLoad);
+
+
+
 
     return () => {
       map.off('load', handleLoad);
+      map.off("style.load", handleStyleLoad);
     };
   }, [config, map, session, status]);
 
@@ -130,7 +148,7 @@ const HotspotMonitoring = () => {
           <MapInstance
             id="deforestation-map"
             className="rounded-md min-h-[50vh]"
-            mapStyle={basemap}
+            mapStyle={DEFAULT_BASEMAP_STYLE}
             mapView={DEFAULT_MAPVIEW}
           />
 
@@ -144,9 +162,9 @@ const HotspotMonitoring = () => {
             <VerificationButton id="hotspotalert" type="hotspotform" />
           </MapFunctionContainer>
           <div className="absolute top-2 left-2 z-50">
-            <BasemapSwitcher onSelect={setBasemap} />
+            <BasemapSwitcher onSelect={handleChangeBasemap} />
           </div>
-          
+
         </div>
 
         <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
@@ -175,8 +193,8 @@ export default function Page() {
   return <SessionProvider>
     <HotspotConfigProvider>
       <MapProvider>
-      <HotspotMonitoring />
-    </MapProvider>
+        <HotspotMonitoring />
+      </MapProvider>
     </HotspotConfigProvider>
   </SessionProvider>
 }
