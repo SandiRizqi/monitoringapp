@@ -22,6 +22,7 @@ import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
 import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/HotspotConfigProvider";
+import VerificationButton from "@/components/mapbutton/VerificationButton";
 // import Image from "next/image"; // Perbaiki import Image
 
 
@@ -102,7 +103,7 @@ const HotspotMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [config, map, session, status, addVectorTile, addHotspotTile]);
+  }, [config, map, session, status]);
 
 
   // useEffect(() => {
@@ -133,6 +134,7 @@ const HotspotMonitoring = () => {
           />
 
           <MapControlsContainer>
+            <VerificationButton id="hotspotalert" />
             <MeasureButton />
             <InfoButton id="hotspotalert" />
             <ResetViewButton />
