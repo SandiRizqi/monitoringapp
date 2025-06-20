@@ -1,3 +1,4 @@
+//src/app/dashboard/hotspot/page.tsx
 "use client"
 import { useEffect, useState } from "react";
 import { useMap } from "@/components/context/MapProvider";
@@ -21,6 +22,7 @@ import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
 import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/HotspotConfigProvider";
+// import Image from "next/image"; // Perbaiki import Image
 
 
 const HotspotMonitoring = () => {
@@ -100,7 +102,7 @@ const HotspotMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [config, map, session, status]);
+  }, [config, map, session, status, addVectorTile, addHotspotTile]);
 
 
   // useEffect(() => {

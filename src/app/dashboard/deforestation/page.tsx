@@ -1,34 +1,46 @@
+//src/app/dashboard/deforestation/page.tsx
 "use client"
-
 import { useState, useEffect } from "react";
+import { useMap } from "@/components/context/MapProvider";
+import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
-import { MapProvider } from "@/components/context/MapProvider";
 import DeforestationStats from "@/components/deforestation/DeforestationStats";
 import CompanyTable from "@/components/deforestation/CompanyTable";
 // import AlertList from "@/components/deforestation/AlertList";
+import { DeforestationConfigProvider } from "@/components/context/DeforestationConfigProvider";
+import { DEFAULT_BASEMAP_STYLE } from "@/components/conts";
 import ChartDeforestation from "@/components/deforestation/ChartDeforestation";
 import DeforestationFilter from "@/components/deforestation/DeforestationFilter";
 import EventList from "@/components/deforestation/EventList";
-import { DEFAULT_MAPVIEW } from "@/components/conts";
-import { DEFAULT_BASEMAP_STYLE } from "@/components/conts";
-import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
-import ResetViewButton from "@/components/mapbutton/ResetView";
-import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
-import { useMap } from "@/components/context/MapProvider";
-import { useSession } from "next-auth/react";
-import { SessionProvider } from "next-auth/react";
-import InfoButton from "@/components/mapbutton/InfoButton";
 import { BACKEND_URL } from "@/components/conts";
+import { DEFAULT_MAPVIEW } from "@/components/conts";
+import { SessionProvider } from "next-auth/react";
+import { MapProvider } from "@/components/context/MapProvider";
+import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
+import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
+import InfoButton from "@/components/mapbutton/InfoButton";
+import ResetViewButton from "@/components/mapbutton/ResetView";
+import { useConfig } from "@/components/context/DeforestationConfigProvider";
 
 
 const DeforestationMonitoring = () => {
   const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
-  const { map, addVectorTile } = useMap();
+  const { config } = useConfig();
   const { data: session, status } = useSession();
+  const { map, addVectorTile } = useMap();
 
   const addDeforestationTile = (id: string, url: string) => {
     if (!map) return;
-    if (map.getSource(id)) return;
+    // if (map.getSource(id)) return;
+    const layerId = `${id}-layer`;
+
+    // Jika layer dan source sudah ada, hapus dulu untuk bisa di-update
+    if (map.getLayer(layerId)) {
+      map.removeLayer(layerId);
+    }
+    if (map.getSource(id)) {
+      map.removeSource(id);
+    }
 
     map.addSource(id, {
       type: "vector",
@@ -68,7 +80,7 @@ const DeforestationMonitoring = () => {
         [141.0, 6.0]
       ]);
       addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
-      addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?token=${session.user.token}`);
+      addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
     };
 
     if (!map.loaded()) {
@@ -80,7 +92,7 @@ const DeforestationMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [map, session, status]);
+  }, [config, map, session, status, addVectorTile, addDeforestationTile]);
 
 
 
@@ -135,12 +147,12 @@ const DeforestationMonitoring = () => {
 
 
 
-export default function SessionDataPage() {
-  return (
-    <SessionProvider>
+export default function Page() {
+  return <SessionProvider>
+    <DeforestationConfigProvider>
       <MapProvider>
         <DeforestationMonitoring />
       </MapProvider>
-    </SessionProvider>
-  )
+    </DeforestationConfigProvider>
+  </SessionProvider>
 }
