@@ -1,6 +1,6 @@
 //src/app/dashboard/deforestation/page.tsx
 "use client"
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useMap } from "@/components/context/MapProvider";
 import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
@@ -27,10 +27,15 @@ import VerificationButton from "@/components/mapbutton/VerificationButton";
 
 
 const DeforestationMonitoring = () => {
-  const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
+  // const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
   const { config } = useConfig();
   const { data: session, status } = useSession();
   const { map, addVectorTile } = useMap();
+
+  const handleChangeBasemap = (URL: string) => {
+    if (!map) return;
+    map.setStyle(URL, { diff: false });
+  }
 
   const addDeforestationTile = (id: string, url: string) => {
     if (!map) return;
@@ -76,24 +81,33 @@ const DeforestationMonitoring = () => {
     if (!map) return;
     if (!session?.user?.token) return;
 
+     const handleStyleLoad = () => {
+      addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
+      addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
+    };
+
     const handleLoad = () => {
       if (map.getSource("deforestation")) return;
       map.fitBounds([
         [95.0, -11.0],
         [141.0, 6.0]
       ]);
-      addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
-      addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
+      
+
+      handleStyleLoad()
     };
 
     if (!map.loaded()) {
       map.once('load', handleLoad);
     } else {
       handleLoad();
-    }
+    };
+
+    map.on("style.load", handleStyleLoad);
 
     return () => {
       map.off('load', handleLoad);
+      map.off("style.load", handleStyleLoad);
     };
   }, [config, map, session, status]);
 
@@ -113,7 +127,7 @@ const DeforestationMonitoring = () => {
           <MapInstance
             id="deforestation-map"
             className="rounded-md min-h-[50vh]"
-            mapStyle={basemap}
+            mapStyle={DEFAULT_BASEMAP_STYLE}
             mapView={DEFAULT_MAPVIEW}
           />
 
@@ -126,7 +140,7 @@ const DeforestationMonitoring = () => {
             <VerificationButton id="deforestation" type="deforestationform"/>
           </MapFunctionContainer>
           <div className="absolute top-2 left-2 z-50">
-            <BasemapSwitcher onSelect={setBasemap} />
+            <BasemapSwitcher onSelect={handleChangeBasemap} />
           </div>
         </div>
 
