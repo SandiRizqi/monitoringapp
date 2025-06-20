@@ -92,7 +92,7 @@ const DeforestationMonitoring = () => {
     return () => {
       map.off('load', handleLoad);
     };
-  }, [config, map, session, status, addVectorTile, addDeforestationTile]);
+  }, [config, map, session, status]);
 
 
 
@@ -105,7 +105,7 @@ const DeforestationMonitoring = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
         {/* Peta */}
-        <div className="relative lg:col-span-2 bg-white rounded-md  h-96 lg:h-auto text-gray-700 shadow-md">
+        <div className="relative lg:col-span-2 bg-white rounded-md  min-h-96 lg:h-auto text-gray-700 shadow-md">
 
           <MapInstance
             id="deforestation-map"

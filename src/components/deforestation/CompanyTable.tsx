@@ -55,47 +55,50 @@ export default function CompanyTable() {
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Top Companies by Events</h3>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Company
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Events
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total Area (ha)
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Avg Confidence
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {companies.map((company, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {company.name}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                  {company.total_events}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                  {company.total_area.toFixed(2)}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                  {company.avg_confidence}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <div className="px-4 py-3 border-b border-gray-200">
+    <h3 className="text-lg font-semibold text-gray-900">Top Companies by Events</h3>
+  </div>
+
+  {/* Scroll wrapper untuk tabel */}
+  <div className="overflow-y-auto max-h-72">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50 sticky top-0 z-10">
+        <tr>
+          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Company
+          </th>
+          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Events
+          </th>
+          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Luas (ha)
+          </th>
+          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Avg. Conf
+          </th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {companies.map((company, index) => (
+          <tr key={index} className="hover:bg-gray-50">
+            <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+              {company.name}
+            </td>
+            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+              {company.total_events}
+            </td>
+            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+              {company.total_area.toFixed(2) } 
+            </td>
+            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+              {company.avg_confidence.toFixed()}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
   );
 }
