@@ -33,7 +33,10 @@ export default function HotspotVerificationForm({ featureProps, onClose }: Props
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}
+        // onMouseEnter={onClose}
+    //   onMouseLeave={onClose}
+        className="space-y-4" >
             <h2 className="text-lg font-semibold">Hotspot Verification</h2>
 
             <div>
@@ -82,7 +85,7 @@ export default function HotspotVerificationForm({ featureProps, onClose }: Props
             </div>
 
             <div>
-                <label className="block text-sm font-medium">Foto URL</label>
+                <label className="block text-sm font-medium">Foto</label>
                 {photoUrls.map((url, idx) => (
                     <div key={idx} className="flex space-x-2 mt-1">
                         <input
@@ -122,13 +125,13 @@ export default function HotspotVerificationForm({ featureProps, onClose }: Props
                 <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+                    className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 transition cursor-pointer"
                 >
                     Batal
                 </button>
                 <button
                     type="submit"
-                    className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                    className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition cursor-pointer"
                 >
                     Simpan
                 </button>

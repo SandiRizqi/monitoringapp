@@ -51,17 +51,51 @@ export default function CompanyTable() {
     }, [session, config.startdate, config.enddate]);
 
     if (loading) {
-        return <div className="p-4">Loading company data...</div>;
-    }
+  return (
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">Top Companies by Events</h3>
+      </div>
+      <div className="overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200 animate-pulse">
+          <thead className="bg-gray-50">
+            <tr>
+              {["Company", "Total Events", "Aman", "Perhatian", "Waspada", "Bahaya"].map((title) => (
+                <th
+                  key={title}
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  {title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {[...Array(5)].map((_, i) => (
+              <tr key={i}>
+                {[...Array(6)].map((_, j) => (
+                  <td key={j} className="px-4 py-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 
     return (
         <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Top Companies by Events</h3>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-72">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Company
@@ -106,6 +140,14 @@ export default function CompanyTable() {
                                 </td>
                             </tr>
                         ))}
+
+                        {companies.length === 0 && (
+                            <tr>
+                                <td colSpan={10} className="text-center px-4 py-6 text-gray-500">
+                                    No data found.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>

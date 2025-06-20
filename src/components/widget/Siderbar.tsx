@@ -8,6 +8,8 @@ import {
   TreePine,
   // Map,
   Database,
+  BellPlus,
+  Monitor,
   Users,
   Key,
   Menu,
@@ -31,10 +33,17 @@ const menuGroups = [
     ],
   },
   {
+    label: 'Settings',
+    items: [
+      { name: 'Notifications', icon: <BellPlus size={18} />, href: '/dashboard/settings/notification' },
+      { name: 'Theme', icon: <Monitor size={18} />, href: '/#' },
+    ],
+  },
+  {
     label: 'Permission',
     items: [
-      { name: 'User Management', icon: <Users size={18} />, href: '/dashboard/permission/users' },
-      { name: 'Role Settings', icon: <Key size={18} />, href: '/dashboard/permission/roles' },
+      { name: 'User Management', icon: <Users size={18} />, href: '/#' },
+      { name: 'Role Settings', icon: <Key size={18} />, href: '/#' },
     ],
   },
 ]

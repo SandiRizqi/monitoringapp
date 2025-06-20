@@ -20,7 +20,10 @@ import MapControlsContainer from "@/components/mapbutton/MapControlsContainer";
 import BasemapSwitcher from "@/components/mapbutton/BasemapSwitcher";
 import InfoButton from "@/components/mapbutton/InfoButton";
 import ResetViewButton from "@/components/mapbutton/ResetView";
+import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/DeforestationConfigProvider";
+import MapFunctionContainer from "@/components/mapbutton/MapFunctionContainer";
+import VerificationButton from "@/components/mapbutton/VerificationButton";
 
 
 const DeforestationMonitoring = () => {
@@ -109,15 +112,19 @@ const DeforestationMonitoring = () => {
 
           <MapInstance
             id="deforestation-map"
-            className="rounded-md"
+            className="rounded-md min-h-[50vh]"
             mapStyle={basemap}
             mapView={DEFAULT_MAPVIEW}
           />
 
           <MapControlsContainer>
+            <MeasureButton />
             <InfoButton id="deforestation" />
             <ResetViewButton />
           </MapControlsContainer>
+          <MapFunctionContainer>
+            <VerificationButton id="deforestation" type="deforestationform"/>
+          </MapFunctionContainer>
           <div className="absolute top-2 left-2 z-50">
             <BasemapSwitcher onSelect={setBasemap} />
           </div>

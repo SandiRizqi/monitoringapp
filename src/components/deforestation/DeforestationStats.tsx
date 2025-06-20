@@ -56,10 +56,10 @@ export default function DeforestationStats() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
             <div className="bg-white p-6 rounded-lg shadow">
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Alert</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Total Alert</h3>
                     <div className="text-3xl font-bold text-blue-600">
                         {loading ? (
-                            <div className="animate-pulse bg-gray-200 h-8 w-16 mx-auto rounded"></div>
+                            <div className="animate-pulse bg-gray-100 h-8 w-16 mx-auto rounded"></div>
                         ) : (
                             stats.total_events.toLocaleString()
                         )}
@@ -69,10 +69,10 @@ export default function DeforestationStats() {
             
             <div className="bg-white p-6 rounded-lg shadow">
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Area</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Total Area</h3>
                     <div className="text-2xl font-bold text-green-600">
                         {loading ? (
-                            <div className="animate-pulse bg-gray-200 h-8 w-16 mx-auto rounded"></div>
+                            <div className="animate-pulse bg-gray-100 h-8 w-16 mx-auto rounded"></div>
                         ) : (
                             stats.total_area.toFixed(2) + " Ha"
                         )}
@@ -82,10 +82,10 @@ export default function DeforestationStats() {
             
             <div className="bg-white p-6 rounded-lg shadow">
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Total AOI</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Total AOI</h3>
                     <div className="text-3xl font-bold text-purple-600">
                         {loading ? (
-                            <div className="animate-pulse bg-gray-200 h-8 w-16 mx-auto rounded"></div>
+                            <div className="animate-pulse bg-gray-100 h-8 w-16 mx-auto rounded"></div>
                         ) : (
                             stats.total_companies.toLocaleString()
                         )}

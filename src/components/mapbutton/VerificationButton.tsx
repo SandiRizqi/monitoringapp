@@ -1,14 +1,16 @@
 import { FilePen } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import HotspotVerificationForm from "../widget/HotspotVerificationForm";
+import DeforestationVerificationForm from "../widget/DeforestationVerificationForm";
 import { useMap } from "../context/MapProvider";
 import { MapMouseEvent } from "maplibre-gl";
 
 type InfoButtonProps = {
   id: string; // ID dari vector tile source
+  type: string;
 };
 
-export default function VerificationButton({ id }: InfoButtonProps) {
+export default function VerificationButton({ id, type }: InfoButtonProps) {
   const { map } = useMap();
   const [showTooltip, setShowTooltip] = useState(false);
   const [active, setActive] = useState(false);
@@ -80,7 +82,7 @@ export default function VerificationButton({ id }: InfoButtonProps) {
           <FilePen size={22} />
         </button>
         {showTooltip && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-1 py-1 text-xs bg-gray-700 text-white rounded-md shadow">
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-2 px-1 py-1 text-xs bg-gray-700/80 text-white rounded-sm shadow">
             {active ? "Click on a feature" : "Verify Mode"}
           </div>
         )}
@@ -92,7 +94,14 @@ export default function VerificationButton({ id }: InfoButtonProps) {
             ref={modalRef}
             className="bg-white max-w-md w-full mx-4 p-4 rounded-lg shadow-lg border border-gray-200 overflow-auto"
           >
-            <HotspotVerificationForm featureProps={featureProps} onClose={() => setFeatureProps(null)}/>
+            {
+                type === "hotspotform" ? (<HotspotVerificationForm featureProps={featureProps} onClose={() => {
+                setFeatureProps(null);
+                setActive(false);
+            }}/>) : (<DeforestationVerificationForm featureProps={featureProps} onClose={() => {
+                setFeatureProps(null);
+                setActive(false);
+            }}/>) }
           </div>
         </div>
       )}
