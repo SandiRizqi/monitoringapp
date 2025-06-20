@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from 'next-auth/react';
 import { BACKEND_URL } from '@/components/conts';
-import { useConfig } from "@/components/context/HotspotConfigProvider";
+import { useConfig } from "@/components/context/DeforestationConfigProvider";
 
 interface Company {
   name: string;
