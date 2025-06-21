@@ -1,6 +1,5 @@
 //src/app/dashboard/deforestation/page.tsx
 "use client"
-import { useEffect } from "react";
 import { useMap } from "@/components/context/MapProvider";
 import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
@@ -26,10 +25,10 @@ import MapFunctionContainer from "@/components/mapbutton/MapFunctionContainer";
 import VerificationButton from "@/components/mapbutton/VerificationButton";
 import FullscreenToggleButton from "@/components/mapbutton/FullscreenToggleButton";
 import PlanetMosaicTimeline from "@/components/mapbutton/PlanetMosaicTimeline";
+import { useEffect, useCallback } from "react";
 
 
 const DeforestationMonitoring = () => {
-  // const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
   const { config } = useConfig();
   const { data: session, status } = useSession();
   const { map, addVectorTile } = useMap();
@@ -37,54 +36,52 @@ const DeforestationMonitoring = () => {
   const handleChangeBasemap = (URL: string) => {
     if (!map) return;
     map.setStyle(URL, { diff: false });
-  }
+  };
 
-  const addDeforestationTile = (id: string, url: string) => {
+  // Perbaikan: Wrap dengan useCallback
+  const addDeforestationTile = useCallback((id: string, url: string) => {
     if (!map) return;
-    // if (map.getSource(id)) return;
+    
     const layerId = `${id}-layer`;
-
-    // Jika layer dan source sudah ada, hapus dulu untuk bisa di-update
+    
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
     }
+    
     if (map.getSource(id)) {
       map.removeSource(id);
     }
-
+    
     map.addSource(id, {
       type: "vector",
       tiles: [`${url}`],
       minzoom: 0,
       maxzoom: 22,
     });
-
+    
     map.addLayer({
       id: `${id}-layer`,
       type: "fill",
       source: id,
-      "source-layer": "deforestation_alerts", // harus sesuai dengan yang dikembalikan ST_AsMVT
+      "source-layer": "deforestation_alerts",
       paint: {
         "fill-color": [
           "step",
           ["get", "confidence"],
-          "#FFEDA0", // default: confidence < 30
-          3, "#FEB24C", // 30 <= confidence < 60
-          4, "#F03B20", // confidence >= 60
+          "#FFEDA0",
+          3, "#FEB24C",
+          4, "#F03B20",
         ],
         "fill-opacity": 1,
-        // "fill-outline-color": "#333333", // optional, bisa juga pakai stroke_color kalau ada
       },
     });
-  };
-
+  }, [map]); // Tambahkan dependency
 
   useEffect(() => {
     if (!map) return;
     if (!session?.user?.token) return;
 
-     const handleStyleLoad = () => {
-      // console.log(map.getStyle())
+    const handleStyleLoad = () => {
       addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
       addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
     };
@@ -95,16 +92,14 @@ const DeforestationMonitoring = () => {
         [95.0, -11.0],
         [141.0, 6.0]
       ]);
-      
-
-      handleStyleLoad()
+      handleStyleLoad();
     };
 
     if (!map.loaded()) {
       map.once('load', handleLoad);
     } else {
       handleLoad();
-    };
+    }
 
     map.on("style.load", handleStyleLoad);
 
@@ -112,7 +107,7 @@ const DeforestationMonitoring = () => {
       map.off('load', handleLoad);
       map.off("style.load", handleStyleLoad);
     };
-  }, [config, map, session, status]);
+  }, [config, map, session, status, addVectorTile, addDeforestationTile]); 
 
 
 
@@ -149,8 +144,8 @@ const DeforestationMonitoring = () => {
           <div className="absolute bottom-2 right-2 z-50">
             <PlanetMosaicTimeline />
           </div>
-          
-        </div>
+
+          </div>
 
         <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
           <DeforestationStats />

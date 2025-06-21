@@ -1,11 +1,11 @@
 //src/components/hotspot/EventList.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { ZoomIn, ChevronLeft, ChevronRight, Filter, ChevronDown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useConfig } from "@/components/context/HotspotConfigProvider";
 import { BACKEND_URL } from "@/components/conts";
+import React, { useEffect, useState, useCallback } from "react";
 
 interface Alert {
     company: string;
@@ -51,7 +51,7 @@ export default function EventList() {
     const { data: session } = useSession();
     const { config } = useConfig();
 
-    const fetchEventData = async (page: number = 1) => {
+    const fetchEventData = useCallback(async (page: number = 1) => {
         if (!session?.user?.token) return;
 
         try {
@@ -74,8 +74,7 @@ export default function EventList() {
                 setAlerts(data.data);
                 setPagination(data.pagination);
 
-                // Extract unique companies and their counts
-                const companyMap = new Map<string, number>();
+                const companyMap = new Map();
                 data.data.forEach(alert => {
                     const count = companyMap.get(alert.company) || 0;
                     companyMap.set(alert.company, count + 1);
@@ -93,7 +92,7 @@ export default function EventList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [session, config.startdate, config.enddate]); // Tambahkan dependencies
 
     // Filter alerts based on selected companies
     useEffect(() => {
@@ -110,7 +109,7 @@ export default function EventList() {
     useEffect(() => {
         setCurrentPage(1);
         fetchEventData(1);
-    }, [session, config.startdate, config.enddate]);
+    }, [fetchEventData]); // Perbaikan: Gunakan fetchEventData sebagai dependency
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -230,6 +229,12 @@ export default function EventList() {
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 CONFIDENCE
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                SATELLITE
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                STATUS
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ACTION

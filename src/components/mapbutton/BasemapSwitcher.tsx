@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 
 type BasemapOption = {
   id: string;
@@ -65,16 +66,23 @@ export default function BasemapSwitcher({ onSelect }: Props) {
                   setActiveId(bm.id);
                   setShowOptions(false);
                 }}
-                className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                  activeId === bm.id
-                    ? "border-indigo-500 ring-2 ring-indigo-300"
-                    : "border-transparent hover:border-gray-300"
-                }`}
+                className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${activeId === bm.id
+                  ? "border-indigo-500 ring-2 ring-indigo-300"
+                  : "border-transparent hover:border-gray-300"
+                  }`}
               >
-                <img
+                {/* <img
                   src={bm.thumbnail}
                   alt={bm.name}
                   loading="lazy"
+                  className="w-full h-20 object-cover"
+                /> */}
+                {/* Perbaikan: Gunakan Next.js Image */}
+                <Image
+                  src={bm.thumbnail}
+                  alt={bm.name}
+                  width={100}
+                  height={20}
                   className="w-full h-20 object-cover"
                 />
                 <div className="absolute bottom-0 w-full bg-black/50 text-white text-xs text-center py-1">
@@ -85,12 +93,22 @@ export default function BasemapSwitcher({ onSelect }: Props) {
           </div>
         ) : (
           <button className="w-14 h-14 rounded-lg border border-gray-200 shadow-md overflow-hidden">
-            <img
+            {/* <img
               src={
                 basemaps.find((b) => b.id === activeId)?.thumbnail ??
                 "/basemaps/streets-v2.png"
               }
               alt="Active basemap"
+              className="w-full h-full object-cover"
+            /> */}
+            <Image
+              src={
+                basemaps.find((b) => b.id === activeId)?.thumbnail ??
+                "/basemaps/streets-v2.png"
+              }
+              alt="Active basemap"
+              width={100}
+              height={100}
               className="w-full h-full object-cover"
             />
           </button>

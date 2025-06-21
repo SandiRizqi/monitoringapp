@@ -1,10 +1,11 @@
+//src/components/deforestation/EventList.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { useSession } from 'next-auth/react';
 import { BACKEND_URL } from '@/components/conts';
 import { ZoomIn, ChevronLeft, ChevronRight, Filter, ChevronDown } from "lucide-react";
 import { useConfig } from "@/components/context/DeforestationConfigProvider";
+import React, { useState, useEffect, useCallback } from "react";
 
 interface Alert {
   company: string;
@@ -49,7 +50,7 @@ export default function EventList() {
   const { data: session } = useSession();
   const { config } = useConfig();
 
-  const fetchEventData = async (page: number = 1) => {
+  const fetchEventData = useCallback(async (page: number = 1) => {
     if (!session?.user?.token) return;
 
     try {
@@ -71,19 +72,18 @@ export default function EventList() {
         const data: EventListResponse = await response.json();
         setAlerts(data.data);
         setPagination(data.pagination);
-        
-        // Extract unique companies and their counts
-        const companyMap = new Map<string, number>();
+
+        const companyMap = new Map();
         data.data.forEach(alert => {
           const count = companyMap.get(alert.company) || 0;
           companyMap.set(alert.company, count + 1);
         });
-        
+
         const companiesList = Array.from(companyMap.entries()).map(([name, count]) => ({
           name,
           count
         })).sort((a, b) => a.name.localeCompare(b.name));
-        
+
         setCompanies(companiesList);
       }
     } catch (error) {
@@ -91,7 +91,7 @@ export default function EventList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session, config.startdate, config.enddate]); // Tambahkan dependencies
 
   // Filter alerts based on selected companies
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function EventList() {
   useEffect(() => {
     setCurrentPage(1);
     fetchEventData(1);
-  }, [session, config.startdate, config.enddate]);
+  }, [fetchEventData]); // Perbaikan: Gunakan fetchEventData sebagai dependency
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

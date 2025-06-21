@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+// import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { PLANET_API_KEY } from "../conts";
+import Image from "next/image";
 
 
 interface Mosaic {
@@ -24,10 +26,9 @@ const PlanetMosaicTimeline = () => {
   const [showTimeline, setShowTimeline] = useState(false);
 
   // Recursive fetch function to get all paginated data
-  const fetchAllMosaics = async (url: string, collected: Mosaic[] = []): Promise<Mosaic[]> => {
+  const fetchAllMosaics = useCallback(async (url: string, collected: Mosaic[] = []): Promise<Mosaic[]> => {
     const res = await fetch(url);
     const data = await res.json();
-
     const combined = [...collected, ...data.mosaics];
 
     if (data._links && data._links._next) {
@@ -35,7 +36,7 @@ const PlanetMosaicTimeline = () => {
     }
 
     return combined;
-  };
+  }, []);
 
   useEffect(() => {
     const getData = async () => {
@@ -46,16 +47,6 @@ const PlanetMosaicTimeline = () => {
           new Date(a.first_acquired).getTime() - new Date(b.first_acquired).getTime()
         );
         setMosaics(mosaics);
-
-        // // 🔽 SET DEFAULT SELECTED TO LAST ITEM
-        // if (mosaics.length > 0) {
-        //   setSelectedMosaic(mosaics[mosaics.length - 1]);
-        // };
-
-        // Scroll ke akhir setelah mosaics dimuat dan diset
-
-
-
       } catch (error) {
         console.error("Error fetching mosaics:", error);
       } finally {
@@ -64,7 +55,7 @@ const PlanetMosaicTimeline = () => {
     };
 
     getData();
-  }, []);
+  }, [fetchAllMosaics]); // Perbaikan: Tambahkan fetchAllMosaics 
 
   useEffect(() => {
     if (showTimeline) {
@@ -130,8 +121,8 @@ const PlanetMosaicTimeline = () => {
                           }
                         }}
                         className={`w-3 h-3 rounded-full border-2 ${isSelected
-                            ? "bg-blue-600 border-blue-600"
-                            : "bg-white border-gray-400 hover:bg-blue-200"
+                          ? "bg-blue-600 border-blue-600"
+                          : "bg-white border-gray-400 hover:bg-blue-200"
                           }`}
                         title={mosaic.name}
                       />
@@ -157,10 +148,17 @@ const PlanetMosaicTimeline = () => {
             title="Show Planet Mosaic Timeline"
           >
             {/* Background image thumbnail */}
-            <img
+            {/* <img
               src="/basemaps/satellite.png"
               alt="Planet Mosaic Thumbnail"
               className="object-cover w-full h-full"
+            /> */}
+            <Image
+              src="/basemaps/satellite.png"
+              alt="Planet Mosaic Thumbnail"
+              width={100}
+              height={100}
+              className="w-full h-full object-cover"
             />
 
             {/* Label overlay */}
