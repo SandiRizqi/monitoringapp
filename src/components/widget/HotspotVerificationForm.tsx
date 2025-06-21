@@ -48,13 +48,14 @@ export default function HotspotVerificationForm({ featureProps, onClose, onSucce
       
       // Set success state untuk menampilkan modal
       setSuccess(true);
-      console.log("Verification saved successfully");
+      // console.log("Verification saved successfully");
+
       
       // Tutup modal setelah 3 detik
       setTimeout(() => {
         onSuccess?.();
         onClose();
-      }, 3000);
+      }, 5000);
       
     } catch (err) {
       console.error("Error saving verification:", err);
@@ -66,21 +67,52 @@ export default function HotspotVerificationForm({ featureProps, onClose, onSucce
 
   if (success) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-          <div className="text-center">
-            <div className="text-green-500 text-4xl mb-4">✓</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-xl shadow-xl max-w-md w-full mx-4 animate-fade-in">
+          <div className="flex flex-col items-center text-center">
+            {/* Success Icon */}
+            <div className="bg-green-100 text-green-600 rounded-full p-3 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Verifikasi Berhasil Disimpan
             </h3>
-            <p className="text-gray-600 mb-4">
-              Data verifikasi hotspot telah tersimpan ke database.
+
+            {/* Description */}
+            <p className="text-sm text-gray-600 mb-4">
+              Data verifikasi hotspot telah berhasil disimpan ke database.
             </p>
-            <div className="text-sm text-gray-500 space-y-1">
-              <p><strong>Hotspot ID:</strong> {(featureProps?.hotspot_id ?? featureProps?.id ?? 'N/A').toString()}</p>
-              <p><strong>Tanggal Verifikasi:</strong> {verificationDate || 'N/A'}</p>
-              <p><strong>Status:</strong> {status || 'N/A'}</p>
-              <p><strong>Bukti Kebakaran:</strong> {fireEvidence ? 'Ya' : 'Tidak'}</p>
+
+            {/* Detail Info */}
+            <div className="w-full text-sm text-gray-700 bg-gray-50 rounded-md p-3 space-y-1 text-left">
+              <p className="truncate">
+                <span className="font-medium">Hotspot ID:</span>{" "}
+                <span className="inline-block max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap align-middle">
+                  {(featureProps?.hotspot_id ?? featureProps?.id ?? "N/A").toString()}
+                </span>
+              </p>
+              <p>
+                <span className="font-medium">Tanggal Verifikasi:</span>{" "}
+                {verificationDate || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">Status:</span> {status || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">Bukti Kebakaran:</span>{" "}
+                {fireEvidence ? "Ya" : "Tidak"}
+              </p>
             </div>
           </div>
         </div>

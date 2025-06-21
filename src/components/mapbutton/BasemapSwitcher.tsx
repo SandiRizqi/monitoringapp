@@ -51,7 +51,7 @@ export default function BasemapSwitcher({ onSelect }: Props) {
 
   return (
     <div
-      className="absolute top-2 left-2 z-50"
+      className="absolute top-2 left-2 z-10"
       onMouseEnter={() => setShowOptions(true)}
       onMouseLeave={() => setShowOptions(false)}
     >

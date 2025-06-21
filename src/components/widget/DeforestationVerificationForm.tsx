@@ -76,7 +76,7 @@ export default function DeforestationVerificationForm({
       setTimeout(() => {
         onSuccess?.();
         onClose();
-      }, 1500);
+      }, 5000);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save verification");
@@ -100,25 +100,44 @@ export default function DeforestationVerificationForm({
   };
 
   if (success) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-          <div className="text-center">
-            <div className="text-green-500 text-4xl mb-4">✓</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Verifikasi Berhasil Disimpan
-            </h3>
-            <p className="text-gray-600">
-              Data verifikasi deforestasi telah tersimpan ke database.
-            </p>
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full mx-4 animate-fade-in">
+        <div className="flex flex-col items-center text-center">
+          {/* Icon sukses */}
+          <div className="bg-green-100 text-green-600 rounded-full p-3 mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
           </div>
+
+          {/* Pesan */}
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+            Verifikasi Berhasil Disimpan
+          </h3>
+          <p className="text-gray-600 text-sm">
+            Data verifikasi deforestasi telah tersimpan ke database.
+          </p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Verifikasi Deforestasi</h2>
         
@@ -275,6 +294,6 @@ export default function DeforestationVerificationForm({
           </div>
         </form>
       </div>
-    </div>
+
   );
 }

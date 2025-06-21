@@ -13,4 +13,4 @@ export const DEFAULT_MAP_EXTEND : [[number, number], [number, number]] = [
 
 // export const BACKEND_URL = "https://monitoringbackend-1075290745302.asia-southeast1.run.app"
 export const PLANET_API_KEY = "PLAK3c1e64a7448e442a8c711e6b994ffdbc";
-export const BACKEND_URL = "http://localhost:8000"
+export const BACKEND_URL = "https://monitoringbackend-1075290745302.asia-southeast1.run.app"

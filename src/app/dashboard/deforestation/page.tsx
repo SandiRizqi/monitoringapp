@@ -138,10 +138,10 @@ const DeforestationMonitoring = () => {
           <MapFunctionContainer>
             <VerificationButton id="deforestation" type="deforestationform"/>
           </MapFunctionContainer>
-          <div className="absolute top-2 left-2 z-50">
+          <div className="absolute top-2 left-2">
             <BasemapSwitcher onSelect={handleChangeBasemap} />
           </div>
-          <div className="absolute bottom-4 right-4 z-50">
+          <div className="absolute bottom-4 right-4">
             <PlanetMosaicTimeline />
           </div>
 
