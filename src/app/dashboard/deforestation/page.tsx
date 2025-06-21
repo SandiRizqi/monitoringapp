@@ -141,7 +141,7 @@ const DeforestationMonitoring = () => {
           <div className="absolute top-2 left-2 z-50">
             <BasemapSwitcher onSelect={handleChangeBasemap} />
           </div>
-          <div className="absolute bottom-2 right-2 z-50">
+          <div className="absolute bottom-4 right-4 z-50">
             <PlanetMosaicTimeline />
           </div>
 
