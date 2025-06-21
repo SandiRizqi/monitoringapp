@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 
 const Header = () => {
   const { data: session } = useSession();
@@ -29,11 +30,18 @@ const Header = () => {
           onClick={() => setDropdownOpen(!dropdownOpen)}
           className="flex items-center focus:outline-none cursor-pointer"
         >
-          <img
+          {/* <img
             src={session?.user?.image || '/default-avatar.png'}
             alt={session?.user?.name || 'User'}
             className="w-10 h-10 rounded-full object-cover border border-gray-100 p-1"
-          />
+          /> */}
+          <Image
+              src={session?.user?.image || '/default-avatar.png'}
+              alt={session?.user?.name || 'User'}
+              width={10}
+              height={10}
+              className="w-10 h-10 rounded-full object-cover border border-gray-100 p-1"
+            />
           <ChevronDown className="ml-1 w-4 h-4 text-gray-600" />
         </button>
 

@@ -1,6 +1,6 @@
 //src/app/dashboard/hotspot/page.tsx
 "use client"
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useMap } from "@/components/context/MapProvider";
 import { useSession } from "next-auth/react";
 import MapInstance from "@/components/common/MapInstance";
@@ -29,7 +29,6 @@ import FullscreenToggleButton from "@/components/mapbutton/FullscreenToggleButto
 
 
 const HotspotMonitoring = () => {
-  // const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
   const { config } = useConfig();
   const { data: session, status } = useSession();
   const { map, addVectorTile } = useMap();
@@ -37,54 +36,50 @@ const HotspotMonitoring = () => {
   const handleChangeBasemap = (URL: string) => {
     if (!map) return;
     map.setStyle(URL, { diff: false });
-  }
+  };
 
-  const addHotspotTile = (id: string, url: string) => {
+  // Perbaikan: Wrap dengan useCallback
+  const addHotspotTile = useCallback((id: string, url: string) => {
     if (!map) return;
-
+    
     const layerId = `${id}-layer`;
-
-    // Jika layer dan source sudah ada, hapus dulu untuk bisa di-update
+    
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
     }
+    
     if (map.getSource(id)) {
       map.removeSource(id);
     }
-
+    
     map.addSource(id, {
       type: "vector",
       tiles: [`${url}`],
       minzoom: 0,
       maxzoom: 22,
     });
-
+    
     map.addLayer({
       id: layerId,
       type: "circle",
       source: id,
-      "source-layer": "hotspot_alerts", // sesuaikan dengan nama layer di ST_AsMVT
+      "source-layer": "hotspot_alerts",
       paint: {
         "circle-radius": 4,
         "circle-color": [
           "match",
           ["get", "category"],
-          "AMAN", "#2ECC71",         // hijau
-          "PERHATIAN", "#F1C40F",    // kuning
-          "WASPADA", "#E67E22",      // oranye
-          "BAHAYA", "#E74C3C",       // merah
-          "#B0BEC5"                  // default abu-abu
+          "AMAN", "#2ECC71",
+          "PERHATIAN", "#F1C40F",
+          "WASPADA", "#E67E22",
+          "BAHAYA", "#E74C3C",
+          "#B0BEC5"
         ],
         "circle-stroke-color": "#ffffff",
         "circle-stroke-width": 1
       },
     });
-  };
-
-
-
-
-
+  }, [map]); // Tambahkan dependency
 
   useEffect(() => {
     if (!map) return;
@@ -95,35 +90,28 @@ const HotspotMonitoring = () => {
       addHotspotTile("hotspotalert", `${BACKEND_URL}/data/tiles/hotspotalert/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
     };
 
-
     const handleLoad = () => {
       if (map.getSource("hotspotalert-layer")) return;
       map.fitBounds([
         [95.0, -11.0],
         [141.0, 6.0]
       ]);
-
       handleStyleLoad();
     };
-
 
     if (!map.loaded()) {
       map.once('load', handleLoad);
     } else {
       handleLoad();
-    };
-
+    }
 
     map.on("style.load", handleStyleLoad);
-
-
-
 
     return () => {
       map.off('load', handleLoad);
       map.off("style.load", handleStyleLoad);
     };
-  }, [config, map, session, status]);
+  }, [config, map, session, status, addVectorTile, addHotspotTile]); // 
 
 
   // useEffect(() => {
