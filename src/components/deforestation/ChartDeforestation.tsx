@@ -62,9 +62,22 @@ export default function ChartDeforestation() {
     fetchChartData();
   }, [session, config.startdate, config.enddate]);
 
-  if (loading) {
-    return <div className="p-4">Loading chart data...</div>;
-  }
+ if (loading) {
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 animate-pulse">
+            <div className="bg-white p-4 rounded-lg shadow h-[350px]">
+                <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-[250px] bg-gray-100 rounded"></div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow h-[350px]">
+                <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-[250px] bg-gray-100 rounded-full mx-auto w-[250px]"></div>
+            </div>
+        </div>
+    );
+}
+
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
       <div className="bg-white p-4 rounded-md shadow">

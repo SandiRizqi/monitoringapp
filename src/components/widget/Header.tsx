@@ -52,13 +52,13 @@ const Header = () => {
               {session?.user?.name}
             </div>
             <Link
-              href="/profile"
+              href="/dashboard/profile"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               My Profile
             </Link>
             <Link
-              href="/settings"
+              href="/#"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Settings
