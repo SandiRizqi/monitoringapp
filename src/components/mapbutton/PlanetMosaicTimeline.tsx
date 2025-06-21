@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useMap } from "../context/MapProvider";
 import { PLANET_API_KEY } from "../conts";
 
 
@@ -22,6 +23,78 @@ const PlanetMosaicTimeline = () => {
   const [selectedMosaic, setSelectedMosaic] = useState<Mosaic | null>(null);
   const [loading, setLoading] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+  const {map} = useMap();
+
+  function getLayerAfterBasemap(map: maplibregl.Map): string | undefined {
+    const style = map.getStyle();
+    if (!style || !style.layers) return undefined;
+
+    // Contoh asumsi: basemap biasanya di bawah, cari layer non-background
+    const nonBasemapLayer = style.layers.find(
+      (layer) =>
+        layer.type !== "background" &&
+        !layer.id.startsWith("basemap") && // atur sesuai nama basemap kamu
+        !layer.id.startsWith("waterway") && // tweak sesuai style
+        !layer.id.startsWith("land")
+    );
+
+    return nonBasemapLayer?.id;
+  };
+
+
+  function addPlanetMosaicTile(map: maplibregl.Map, id: string, tileUrl: string) {
+    // Jangan tambah dua kali
+    if (map.getSource(id)) return;
+
+    // Tambahkan source
+    map.addSource(id, {
+      type: "raster",
+      tiles: [tileUrl],
+      tileSize: 256,
+    });
+
+    // Tambahkan layer
+    map.addLayer(
+      {
+        id: id,
+        type: "raster",
+        source: id,
+        paint: {
+          "raster-opacity": 1,
+        },
+      },
+      getLayerAfterBasemap(map) // << ID layer pertama setelah basemap
+    );
+  }
+
+  function addAndChangePlanetBasemap(URL: string) {
+    if (!map) return;
+    const oldLayer = "planet-tile";
+    if (map.getLayer(oldLayer)) {
+      map.removeLayer(oldLayer);
+    }
+    if (map.getSource(oldLayer)) {
+      map.removeSource(oldLayer);
+    }
+
+    addPlanetMosaicTile(map, "planet-tile", URL);
+  }
+
+
+  function deletePlanetBasemap() {
+    if (!map) return;
+    const oldLayer = "planet-tile";
+    if (map.getLayer(oldLayer)) {
+      map.removeLayer(oldLayer);
+    }
+    if (map.getSource(oldLayer)) {
+      map.removeSource(oldLayer);
+    }
+  }
+
+  
+
+
 
   // Recursive fetch function to get all paginated data
   const fetchAllMosaics = async (url: string, collected: Mosaic[] = []): Promise<Mosaic[]> => {
@@ -78,6 +151,16 @@ const PlanetMosaicTimeline = () => {
       }, 100); // beri delay kecil agar rendering selesai
     }
   }, [showTimeline])
+
+
+  useEffect(() => {
+    if (selectedMosaic) {
+      addAndChangePlanetBasemap(selectedMosaic._links.tiles)
+    } else {
+      deletePlanetBasemap();
+    }
+
+  },[selectedMosaic])
 
 
   return (
@@ -153,7 +236,7 @@ const PlanetMosaicTimeline = () => {
         {!showTimeline && (
           <button
             onClick={() => setShowTimeline(true)}
-            className="z-50 w-[80px] h-[50px] rounded-xl overflow-hidden shadow-md relative cursor-pointer border border-gray-300 hover:scale-105 transition"
+            className="z-50 w-[70px] h-[50px] rounded-md overflow-hidden shadow-md relative cursor-pointer border border-gray-300 hover:scale-105 transition"
             title="Show Planet Mosaic Timeline"
           >
             {/* Background image thumbnail */}
