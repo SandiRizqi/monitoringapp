@@ -25,6 +25,7 @@ import { useConfig } from "@/components/context/DeforestationConfigProvider";
 import MapFunctionContainer from "@/components/mapbutton/MapFunctionContainer";
 import VerificationButton from "@/components/mapbutton/VerificationButton";
 import FullscreenToggleButton from "@/components/mapbutton/FullscreenToggleButton";
+import PlanetMosaicTimeline from "@/components/mapbutton/PlanetMosaicTimeline";
 
 
 const DeforestationMonitoring = () => {
@@ -83,6 +84,7 @@ const DeforestationMonitoring = () => {
     if (!session?.user?.token) return;
 
      const handleStyleLoad = () => {
+      // console.log(map.getStyle())
       addVectorTile("user-aois", `${BACKEND_URL}/data/tiles/user-aois/{z}/{x}/{y}/?token=${session.user.token}`);
       addDeforestationTile("deforestation", `${BACKEND_URL}/data/tiles/deforestation/{z}/{x}/{y}/?startdate=${config.startdate}&enddate=${config.enddate}&token=${session.user.token}`);
     };
@@ -144,6 +146,10 @@ const DeforestationMonitoring = () => {
           <div className="absolute top-2 left-2 z-50">
             <BasemapSwitcher onSelect={handleChangeBasemap} />
           </div>
+          <div className="absolute bottom-2 right-2 z-50">
+            <PlanetMosaicTimeline />
+          </div>
+          
         </div>
 
         <div className="flex flex-col gap-2 text-gray-700  lg:h-full ">
