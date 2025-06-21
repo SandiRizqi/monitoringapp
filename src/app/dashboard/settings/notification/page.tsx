@@ -1,31 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SessionProvider } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { BACKEND_URL } from "@/components/conts";
+import { Notification } from "@/components/common/Notification";
 
-const NOTIFICATION_OPTIONS = [
-  "Deforestation Alert",
-  "Hotspot Detected",
-  "System Update",
-];
+const NotificationSettingsPage = () => {
+  const { data: session, status } = useSession();
 
-export default function NotificationSettingsPage() {
-  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [notifyHotspot, setNotifyHotspot] = useState(true);
+  const [notifyDeforestation, setNotifyDeforestation] = useState(true);
   const [emailRecipients, setEmailRecipients] = useState<string[]>([""]);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookStatus, setWebhookStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
 
-  const toggleNotification = (name: string) => {
-    setSelectedNotifications((prev) =>
-      prev.includes(name)
-        ? prev.filter((n) => n !== name)
-        : [...prev, name]
-    );
-  };
+  const [loading, setLoading] = useState(true);
 
   const handleWebhookTest = async () => {
     if (!webhookUrl) return;
 
     setWebhookStatus("testing");
-
     try {
       const res = await fetch(webhookUrl, {
         method: "POST",
@@ -33,52 +28,120 @@ export default function NotificationSettingsPage() {
         body: JSON.stringify({ test: true }),
       });
 
-      if (res.ok) {
-        setWebhookStatus("success");
-      } else {
-        setWebhookStatus("error");
-      }
+      setWebhookStatus(res.ok ? "success" : "error");
     } catch {
       setWebhookStatus("error");
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const payload = {
-      notifications: selectedNotifications,
-      emails: emailRecipients.filter(Boolean),
-      webhook_url: webhookUrl,
+  // Jika webhook diisi tapi belum valid, cegah penyimpanan
+  if (webhookUrl && webhookStatus !== "success") {
+    Notification("Error", "Webhook belum berhasil diuji. Harap klik 'Test URL' dan pastikan status sukses sebelum menyimpan.");
+    return;
+  }
+
+  const payload = {
+    push_notifications: pushNotifications,
+    notify_on_new_hotspot_data: notifyHotspot,
+    notify_on_new_deforestation_data: notifyDeforestation,
+    receivers_emails: emailRecipients.filter(Boolean),
+    webhook_url: webhookUrl || null,
+  };
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/accounts/notification-setting/`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Token ${session?.user?.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Failed to update");
+    Notification("Success", "Pengaturan notifikasi disimpan.");
+  } catch  {
+    Notification("Error", "Gagal menyimpan pengaturan.");
+  }
+};
+
+
+  useEffect(() => {
+    const getNotifSettings = async () => {
+      if (!session?.user?.token) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/accounts/notification-setting/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${session.user.token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+
+        const data = await response.json();
+        console.log("Fetched notification settings:", data);
+
+        setPushNotifications(data.push_notifications);
+        setNotifyHotspot(data.notify_on_new_hotspot_data);
+        setNotifyDeforestation(data.notify_on_new_deforestation_data);
+        setEmailRecipients(data.receivers_emails.length > 0 ? data.receivers_emails : [""]);
+        setWebhookUrl(data.webhook_url || "");
+      } catch (error) {
+        Notification("Error", `Gagal memuat pengaturan notifikasi: ${error}`);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    console.log("Saving settings:", payload);
-    alert("Pengaturan notifikasi berhasil disimpan.");
-  };
+    if (status === "authenticated") {
+      getNotifSettings();
+    }
+  }, [status, session?.user?.token]);
+
+  if (loading) return <div className="text-center py-10">Memuat...</div>;
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Pengaturan Notifikasi</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Pilihan Notifikasi */}
-        <div>
-          <label className="block font-medium mb-2">Notifikasi yang ingin diterima:</label>
-          <div className="space-y-2">
-            {NOTIFICATION_OPTIONS.map((notif) => (
-              <label key={notif} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={selectedNotifications.includes(notif)}
-                  onChange={() => toggleNotification(notif)}
-                />
-                <span>{notif}</span>
-              </label>
-            ))}
-          </div>
+        {/* Push Notification */}
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={pushNotifications}
+            onChange={() => setPushNotifications(!pushNotifications)}
+          />
+          <label className="font-medium">Aktifkan push notifications</label>
         </div>
 
-        {/* Daftar Email */}
+        {/* Notifikasi Hotspot */}
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={notifyHotspot}
+            onChange={() => setNotifyHotspot(!notifyHotspot)}
+          />
+          <label className="font-medium">Beritahu saat hotspot terdeteksi</label>
+        </div>
+
+        {/* Notifikasi Deforestasi */}
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={notifyDeforestation}
+            onChange={() => setNotifyDeforestation(!notifyDeforestation)}
+          />
+          <label className="font-medium">Beritahu saat ada deforestasi</label>
+        </div>
+
+        {/* Email */}
         <div>
           <label className="block font-medium mb-2">Email Penerima</label>
           {emailRecipients.map((email, index) => (
@@ -118,7 +181,7 @@ export default function NotificationSettingsPage() {
           </button>
         </div>
 
-        {/* Webhook URL & Test Button */}
+        {/* Webhook */}
         <div>
           <label className="block font-medium mb-2">Webhook URL (opsional)</label>
           <div className="flex items-center space-x-2">
@@ -155,7 +218,7 @@ export default function NotificationSettingsPage() {
           )}
         </div>
 
-        {/* Tombol Submit */}
+        {/* Simpan */}
         <div className="flex justify-end">
           <button
             type="submit"
@@ -166,5 +229,13 @@ export default function NotificationSettingsPage() {
         </div>
       </form>
     </div>
+  );
+};
+
+export default function Page() {
+  return (
+    <SessionProvider>
+      <NotificationSettingsPage />
+    </SessionProvider>
   );
 }

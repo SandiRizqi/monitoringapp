@@ -24,6 +24,7 @@ import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/DeforestationConfigProvider";
 import MapFunctionContainer from "@/components/mapbutton/MapFunctionContainer";
 import VerificationButton from "@/components/mapbutton/VerificationButton";
+import FullscreenToggleButton from "@/components/mapbutton/FullscreenToggleButton";
 
 
 const DeforestationMonitoring = () => {
@@ -122,7 +123,7 @@ const DeforestationMonitoring = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
         {/* Peta */}
-        <div className="relative lg:col-span-2 bg-white rounded-md  min-h-96 lg:h-auto text-gray-700 shadow-md">
+        <div className="relative lg:col-span-2 bg-white rounded-md  min-h-96 lg:h-auto text-gray-700 shadow-md" id="deforestation-map-container">
 
           <MapInstance
             id="deforestation-map"
@@ -135,6 +136,7 @@ const DeforestationMonitoring = () => {
             <MeasureButton />
             <InfoButton id="deforestation" />
             <ResetViewButton />
+            <FullscreenToggleButton id="deforestation-map-container" />
           </MapControlsContainer>
           <MapFunctionContainer>
             <VerificationButton id="deforestation" type="deforestationform"/>

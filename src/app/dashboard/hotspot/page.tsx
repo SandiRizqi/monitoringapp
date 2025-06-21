@@ -24,6 +24,7 @@ import ResetViewButton from "@/components/mapbutton/ResetView";
 import MeasureButton from "@/components/mapbutton/MeasureButton";
 import { useConfig } from "@/components/context/HotspotConfigProvider";
 import VerificationButton from "@/components/mapbutton/VerificationButton";
+import FullscreenToggleButton from "@/components/mapbutton/FullscreenToggleButton";
 // import Image from "next/image"; // Perbaiki import Image
 
 
@@ -143,10 +144,10 @@ const HotspotMonitoring = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2 lg:items-stretch">
         {/* Peta */}
-        <div className="relative lg:col-span-2 bg-white rounded-md  h-96 lg:h-auto text-gray-700 shadow-md">
+        <div className="relative lg:col-span-2 bg-white rounded-md  h-96 lg:h-auto text-gray-700 shadow-md" id="hotspot-map-container">
 
           <MapInstance
-            id="deforestation-map"
+            id="hotspot-map"
             className="rounded-md min-h-[50vh]"
             mapStyle={DEFAULT_BASEMAP_STYLE}
             mapView={DEFAULT_MAPVIEW}
@@ -156,6 +157,7 @@ const HotspotMonitoring = () => {
             <MeasureButton />
             <InfoButton id="hotspotalert" />
             <ResetViewButton />
+            <FullscreenToggleButton id="hotspot-map-container" />
           </MapControlsContainer>
 
           <MapFunctionContainer>

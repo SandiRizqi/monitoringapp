@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { BarChart, Bar, PieChart, Pie, Cell, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { BACKEND_URL } from '@/components/conts';
 import { useConfig } from '@/components/context/DeforestationConfigProvider';
+import { Notification } from '../common/Notification';
 
 interface ChartData {
   monthly_data: Array<{
@@ -51,7 +52,8 @@ export default function ChartDeforestation() {
           setChartData(data);
         }
       } catch (error) {
-        console.error('Error fetching chart data:', error);
+        // console.error('Error fetching chart data:', error);
+        Notification("Error", `Error fetching chart data: ${ error}`)
       } finally {
         setLoading(false);
       }
@@ -64,8 +66,8 @@ export default function ChartDeforestation() {
     return <div className="p-4">Loading chart data...</div>;
   }
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div className="bg-white p-4 rounded-lg shadow">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+      <div className="bg-white p-4 rounded-md shadow">
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Monthly Deforestation Trends</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData.monthly_data}>
@@ -79,7 +81,7 @@ export default function ChartDeforestation() {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-md shadow">
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Alert Categories</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
