@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
 import { useMap } from "../context/MapProvider";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { PLANET_API_KEY } from "../conts";
@@ -156,12 +155,9 @@ const PlanetMosaicTimeline = () => {
 
   return (
     <>
-
-
-      <>
         {/* Timeline Panel */}
         {showTimeline && (
-          <div className="w-[360px] bg-white/80 shadow-md rounded-md z-50 p-2 backdrop-blur relative">
+          <div className="w-[360px] bg-white/80 shadow-md rounded-md z-10 p-2 backdrop-blur relative">
             {/* Close Button (inside panel) */}
             <button
               onClick={() => setShowTimeline(false)}
@@ -251,8 +247,6 @@ const PlanetMosaicTimeline = () => {
           </button>
 
         )}
-      </>
-
     </>
 
 
