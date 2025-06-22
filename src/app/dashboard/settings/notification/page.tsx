@@ -108,7 +108,7 @@ const NotificationSettingsPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold mb-6">Pengaturan Notifikasi</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900">Pengaturan Notifikasi</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* Push Notification */}
@@ -118,7 +118,7 @@ const NotificationSettingsPage = () => {
             checked={pushNotifications}
             onChange={() => setPushNotifications(!pushNotifications)}
           />
-          <label className="font-medium">Aktifkan push notifications</label>
+          <label className="font-medium text-gray-900">Aktifkan push notifications</label>
         </div>
 
         {/* Notifikasi Hotspot */}
@@ -128,7 +128,7 @@ const NotificationSettingsPage = () => {
             checked={notifyHotspot}
             onChange={() => setNotifyHotspot(!notifyHotspot)}
           />
-          <label className="font-medium">Beritahu saat hotspot terdeteksi</label>
+          <label className="font-medium text-gray-900">Beritahu saat hotspot terdeteksi</label>
         </div>
 
         {/* Notifikasi Deforestasi */}
@@ -138,17 +138,17 @@ const NotificationSettingsPage = () => {
             checked={notifyDeforestation}
             onChange={() => setNotifyDeforestation(!notifyDeforestation)}
           />
-          <label className="font-medium">Beritahu saat ada deforestasi</label>
+          <label className="font-medium text-gray-900">Beritahu saat ada deforestasi</label>
         </div>
 
         {/* Email */}
         <div>
-          <label className="block font-medium mb-2">Email Penerima</label>
+          <label className="block font-medium mb-2 text-gray-900">Email Penerima</label>
           {emailRecipients.map((email, index) => (
             <div key={index} className="flex space-x-2 mt-1">
               <input
                 type="email"
-                className="w-full border px-3 py-2 rounded"
+                className="w-full border px-3 py-2 rounded text-gray-900"
                 placeholder="email@example.com"
                 value={email}
                 onChange={(e) =>
@@ -183,11 +183,11 @@ const NotificationSettingsPage = () => {
 
         {/* Webhook */}
         <div>
-          <label className="block font-medium mb-2">Webhook URL (opsional)</label>
+          <label className="block font-medium mb-2 text-gray-900">Webhook URL (opsional)</label>
           <div className="flex items-center space-x-2">
             <input
               type="url"
-              className={`w-full border px-3 py-2 rounded ${
+              className={`w-full border px-3 py-2 rounded text-gray-900 ${
                 webhookStatus === "success"
                   ? "border-green-500"
                   : webhookStatus === "error"
@@ -204,7 +204,7 @@ const NotificationSettingsPage = () => {
             <button
               type="button"
               onClick={handleWebhookTest}
-              className="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm cursor-pointer"
+              className="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm cursor-pointer text-gray-900"
               disabled={webhookStatus === "testing"}
             >
               {webhookStatus === "testing" ? "Menguji..." : "Test URL"}
