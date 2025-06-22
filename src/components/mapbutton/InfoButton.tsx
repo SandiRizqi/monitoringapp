@@ -8,7 +8,7 @@ type InfoButtonProps = {
 };
 
 export default function InfoButton({ id }: InfoButtonProps) {
-  const { map } = useMap();
+  const { map, addSelectedFeature } = useMap();
   const [showTooltip, setShowTooltip] = useState(false);
   const [active, setActive] = useState(false);
   const [featureProps, setFeatureProps] = useState<Record<string, null> | null>(null);
@@ -26,6 +26,7 @@ export default function InfoButton({ id }: InfoButtonProps) {
 
       if (features.length > 0) {
         setFeatureProps(features[0].properties || null);
+        addSelectedFeature(features[0]);
       } else {
         setFeatureProps(null);
         setActive(false);
