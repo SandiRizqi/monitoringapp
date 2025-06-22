@@ -64,7 +64,8 @@ export default function Sidebar() {
       >
         {/* Header with title and close button (mobile only) */}
         <div className="flex items-center justify-between px-6 py-4">
-          <span className="text-2xl font-bold text-indigo-600">Dashboard</span>
+          {/* <span className="text-2xl font-bold text-indigo-600">Dashboard</span> */}
+          <Link href="/dashboard" className="text-2xl font-bold text-indigo-600">Dashboard</Link>
           {/* Close Button visible only on mobile */}
           <button
             className="md:hidden text-gray-500 hover:text-gray-800 p-2 bg-white rounded-md shadow-sm z-80 cursor-pointer"
