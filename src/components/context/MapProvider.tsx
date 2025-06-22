@@ -14,6 +14,7 @@ type MapContextType = {
   drawPolygon: (oords: [number, number][], layer: Layer) => void
   zoomToLayer: (oords: [number, number][]) => void
   addVectorTile: (id: string, url: string) => void
+  addSelectedFeature: (feature: GeoJSON.Feature) => void
 };
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -29,6 +30,61 @@ export const useMap = () => {
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [loading, setLoadingMap] = useState<boolean>(false);
+  const [currentSelectedFeatureId, setcurrentSelectedFeatureId] = useState<string | null>(null);
+
+  function addSelectedFeature(feature: GeoJSON.Feature) {
+    if (!map) return;
+
+    const newId = feature.properties?.id;
+    if (!newId) return;
+
+    const sourceId = 'selected-feature';
+    const layerId = 'selected-feature-outline';
+
+    // Jika ID sama → hapus layer dan source
+    if (currentSelectedFeatureId === newId) {
+      if (map.getLayer(layerId)) {
+        map.removeLayer(layerId);
+      }
+      if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
+      }
+      setcurrentSelectedFeatureId(null);
+      return;
+    }
+
+    const geojson: GeoJSON.FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [feature],
+    };
+
+    // Kalau source dan layer sudah ada → update datanya
+    if (map.getSource(sourceId)) {
+      (map.getSource(sourceId) as maplibregl.GeoJSONSource).setData(geojson);
+    } else {
+      map.addSource(sourceId, {
+        type: 'geojson',
+        data: geojson,
+      });
+
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': '#40E0D0',       // Biru toska
+          'line-width': 3,
+          'line-opacity': 1,
+        },
+      });
+    }
+
+    setcurrentSelectedFeatureId(newId);
+  }
+
+
+
+
 
   const zoomToLayer = (coords: [number, number][]) => {
     if (!map) return;
@@ -70,13 +126,13 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       (map.getSource(sourceId) as GeoJSONSource).setData(polygonData);
 
       if (map.getLayer("polygon-fill")) {
-      if (layer.fill_color && layer.fill_color !== "") {
-        map.setPaintProperty("polygon-fill", "fill-color", layer.fill_color);
-        map.setPaintProperty("polygon-fill", "fill-opacity", 0.5); // Adjust as needed
-      } else {
-        map.setPaintProperty("polygon-fill", "fill-opacity", 0); // Fully transparent
+        if (layer.fill_color && layer.fill_color !== "") {
+          map.setPaintProperty("polygon-fill", "fill-color", layer.fill_color);
+          map.setPaintProperty("polygon-fill", "fill-opacity", 0.5); // Adjust as needed
+        } else {
+          map.setPaintProperty("polygon-fill", "fill-opacity", 0); // Fully transparent
+        }
       }
-    }
 
       if (map.getLayer("polygon-border")) {
         map.setPaintProperty("polygon-border", "line-color", layer.stroke_color || "#000000");
@@ -171,10 +227,12 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
 
   return (
-    <MapContext.Provider value={{ map, setMap, loading, setLoadingMap, drawPolygon,
+    <MapContext.Provider value={{
+      map, setMap, loading, setLoadingMap, drawPolygon,
       zoomToLayer,
       addVectorTile,
-     }}>
+      addSelectedFeature
+    }}>
       {children}
       {loading && <LoadingMap />}
     </MapContext.Provider>
