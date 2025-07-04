@@ -1,3 +1,4 @@
+//src/app/dashboard/data/page.tsx
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Layer } from '@/components/types/layers';
@@ -93,6 +94,7 @@ const LayersPage = () => {
 
     const handleSave = async (layer: Layer) => {
         if (!session?.user?.token) return;
+
         try {
             const res = await fetch(`${BACKEND_URL}/data/user-aois/`, {
                 method: 'POST',
@@ -106,7 +108,8 @@ const LayersPage = () => {
             const result = await res.json();
 
             if (!res.ok) {
-                const message = result?.detail || 'Failed to save data';
+                // Tangani error dari backend dengan lebih spesifik
+                const message = result?.detail || result?.errors?.geometry?.[0] || 'Failed to save data';
                 throw new Error(message);
             }
 

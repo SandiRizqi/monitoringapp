@@ -1,4 +1,7 @@
+// src/components/widget/LayerForm.tsx
+
 'use client'
+
 import { useState, useEffect, useCallback } from 'react';
 import Dropzone from '../common/Dropzone';
 import { Layer } from '../types/layers';
@@ -16,12 +19,36 @@ type Props = {
   onClose: () => void;
 };
 
+const calculatePolygonArea = (coordinates: [number, number][]): number => {
+  if (coordinates.length < 3) return 0;
+
+  // Menggunakan formula Shoelace untuk menghitung luas
+  let area = 0;
+  const n = coordinates.length;
+
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    area += coordinates[i][0] * coordinates[j][1];
+    area -= coordinates[j][0] * coordinates[i][1];
+  }
+
+  area = Math.abs(area) / 2;
+
+  // Konversi dari derajat persegi ke meter persegi (perkiraan)
+  // 1 derajat ≈ 111,320 meter di ekuator
+  const metersPerDegree = 111320;
+  const areaInSquareMeters = area * metersPerDegree * metersPerDegree;
+
+  // Konversi ke hektar (1 hektar = 10,000 m²)
+  return areaInSquareMeters / 10000;
+};
+
 export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const { map, drawPolygon, zoomToLayer } = useMap();
-  const [basemap, setBasemap] = useState<string>(DEFAULT_BASEMAP_STYLE);
+  const [basemap, setBasemap] = useState(DEFAULT_BASEMAP_STYLE);
   const { data: session } = useSession();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<Layer>(
     initialData || {
       name: '',
@@ -34,12 +61,23 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
     }
   );
 
+  const MAX_AREA_HECTARES = 10000; // 10,000 hektar
+
   const onUpload = (coords: [number, number][]) => {
     if (!map) return;
 
+    // Validasi luas area sebelum menggambar
+    const areaHectares = calculatePolygonArea(coords);
+
+    if (areaHectares > MAX_AREA_HECTARES) {
+      Notification("Error",
+        `Area too large! Maximum allowed area is ${MAX_AREA_HECTARES.toLocaleString()} hectares. `
+      );
+      return;
+    }
+
     drawPolygon(coords, form);
     zoomToLayer(coords);
-
     setForm((prev) => ({
       ...prev,
       geometry: {
@@ -47,24 +85,40 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
         coordinates: [coords]
       }
     }));
+
+    Notification("Success",
+      `Area uploaded successfully. Total area: ${areaHectares.toLocaleString()} hectares.`
+    );
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === 'stroke_width' ? parseInt(value) || 0 : value,
+      [name]: name === 'stroke_width' ? parseInt(value) || 0 : value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!form.geometry) {
       Notification("Error", "You must input the geometry.");
       return;
+    }
+
+    if (form.geometry.coordinates && form.geometry.coordinates[0]) {
+      const areaHectares = calculatePolygonArea(form.geometry.coordinates[0]);
+
+      if (areaHectares > MAX_AREA_HECTARES) {
+        Notification("Error",
+          `Area too large! Maximum allowed area is ${MAX_AREA_HECTARES.toLocaleString()} hectares, ` +
+          `but the current area is ${areaHectares.toLocaleString()} hectares.`
+        );
+        return;
+      }
     }
 
     setIsSaving(true);
@@ -78,8 +132,8 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
   const fetchDatabyId = useCallback(async (id: string | undefined) => {
     if (!id) return;
     if (!session?.user?.token) return;
-    setIsLoading(true);
 
+    setIsLoading(true);
     try {
       const res = await fetch(`${BACKEND_URL}/data/user-aois/?id=${id}&geom=true`, {
         method: 'GET',
@@ -90,9 +144,11 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
       });
 
       if (!res.ok) throw new Error('Failed to fetch layers');
+
       const data = await res.json();
       const coords: [number, number][] = data.features[0].geometry.coordinates[0];
       const properties: Layer = data.features[0].properties;
+
       drawPolygon(coords, properties);
       zoomToLayer(coords);
       setForm((prev) => ({
@@ -102,6 +158,11 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
           coordinates: [coords]
         }
       }));
+
+      const areaHectares = calculatePolygonArea(coords);
+      Notification("Success",
+        `Area loaded successfully. Total area: ${areaHectares.toLocaleString()} hectares.`
+      );
 
     } catch (error) {
       if (error instanceof Error) {
@@ -132,7 +193,6 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
     return () => {
       map.off('load', handleLoad);
     };
-
   }, [map, initialData, fetchDatabyId]);
 
   return (
@@ -174,11 +234,17 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
           </div>
 
         ) : (
-
           <form onSubmit={handleSubmit} className="w-1/2 flex flex-col overflow-y-auto">
             <h2 className="text-lg font-bold mb-4">
               {initialData ? 'Edit Layer' : 'Add Layer'}
             </h2>
+
+            {/* Area Limit Information */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+              <p className="text-sm text-yellow-800">
+                <strong>Maximum Area Limit:</strong> {MAX_AREA_HECTARES.toLocaleString()} hectares
+              </p>
+            </div>
 
             <input
               name="name"
@@ -188,6 +254,7 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
               className="w-full p-2 border rounded mb-4"
               required
             />
+
 
             <textarea
               name="description"
@@ -252,10 +319,10 @@ export default function LayerForm({ initialData, onSubmit, onClose }: Props) {
               className="w-20 p-1 border rounded mb-4"
               min={0}
             />
-            <label className="mb-1 text-sm font-medium text-gray-700">Geometry File (shp/geojson/kml)</label>
+            <label className="mb-2 text-sm font-medium text-gray-700">Geometry File (shp/geojson/kml)</label>
             <Dropzone onUpload={onUpload} />
 
-            <div className="mt-auto flex justify-end gap-2">
+            <div className="mt-3 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
