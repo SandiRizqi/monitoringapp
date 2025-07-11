@@ -43,7 +43,7 @@ export default function InfoButton({ id }: InfoButtonProps) {
       map.getCanvas().style.cursor = "";
       map.off("click", handleClick);
     };
-  }, [map, id, active]);
+  }, [map, id, active, addSelectedFeature]);
 
   // Click outside to close
   useEffect(() => {

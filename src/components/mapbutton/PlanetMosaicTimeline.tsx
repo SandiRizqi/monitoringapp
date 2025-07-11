@@ -150,7 +150,7 @@ const PlanetMosaicTimeline = () => {
       deletePlanetBasemap();
     }
 
-  },[selectedMosaic])
+  },[selectedMosaic, addAndChangePlanetBasemap, deletePlanetBasemap])
 
 
   return (
